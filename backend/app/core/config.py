@@ -54,6 +54,13 @@ class Settings(BaseSettings):
     free_shipping_threshold_cents: int = 5000
     tax_rate_bps: int = 663
 
+    # Email (guest checkout receipts)
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_app_password: str = ""
+    email_from: str = ""
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def _split_origins(cls, value: object) -> object:
