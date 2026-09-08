@@ -1,0 +1,59 @@
+# ---------------------------------------------------------------------------
+# Brings up the whole store: FastAPI backend (SQLite) + the built React app
+# served by nginx.
+#
+#   docker compose up --build
+#   docker compose exec backend python -m scripts.seed
+#
+# Storefront : http://localhost:5173
+# API        : http://localhost:8000  (docs at /docs)
+#
+# The database is a SQLite file on the `backend-data` volume, so it survives
+# `docker compose down` and is lost only on `down -v`.
+# ---------------------------------------------------------------------------
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: toybox-backend
+    environment:
+      APP_NAME: ToyBox
+      ENVIRONMENT: development
+      DEBUG: "true"
+      DATABASE_URL: sqlite:////data/app.db
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-me-to-a-long-random-string}
+      ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+      REFRESH_TOKEN_EXPIRE_DAYS: "7"
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+      UPLOAD_DIR: static/uploads
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      CHECKOUT_SUCCESS_URL: http://localhost:5173/checkout/success
+      CHECKOUT_CANCEL_URL: http://localhost:5173/checkout/cancel
+      ALLOW_DEV_PAYMENT: "true"
+    volumes:
+      - backend-data:/data
+      - backend-uploads:/app/static/uploads
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:8000
+    container_name: toybox-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  backend-data:
+  backend-uploads:

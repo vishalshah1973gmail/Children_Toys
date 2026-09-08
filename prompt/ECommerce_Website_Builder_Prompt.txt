@@ -1,0 +1,174 @@
+### ROLE / INSTRUCTION ###
+You are a senior full-stack engineer. Build a complete, runnable e-commerce web
+application that sells children's toys. Output the entire codebase in one pass:
+every file, in full, with its exact path as a header above it. Write production-
+quality code that runs after following the README setup steps — no placeholders,
+no "// implement this later", no truncated files.
+### CONTEXT ###
+Stack (use exactly this):
+- Frontend: React 18 + Vite + TypeScript, React Router, Tailwind CSS, Zustand for
+  cart state, Axios for API calls.
+- Backend: Python 3.11 + FastAPI, SQLAlchemy 2.x ORM, Alembic migrations,
+  Pydantic v2 schemas, Uvicorn.
+- Database: SQLite.
+- Payments: Stripe Checkout in test mode, with a webhook endpoint that confirms
+  orders.
+- Frontend and backend are separate services in one repo: /frontend and /backend.
+Authentication:
+- Username + password stored in the application's own SQLite database.
+- Hash passwords with bcrypt (passlib). Never store or log plaintext passwords.
+- Issue JWT access tokens (30 min) and refresh tokens (7 days) signed with a
+  secret read from an environment variable.
+- A role column on the user table with values customer and admin. Enforce
+  admin-only routes with a FastAPI dependency that checks the role claim.
+- Endpoints: register, login, refresh, logout, get current user, change password.
+Data model — define these tables with sensible columns, types, indexes, and
+foreign keys: users, categories, products, product_images, cart_items, orders,
+order_items, payments.
+Products carry: name, slug, description, price in cents, stock quantity,
+category, recommended minimum and maximum age, brand, safety notes, and images.
+Business rules to enforce server-side:
+- Prices and stock are authoritative on the backend; never trust a price sent by
+  the browser.
+- Reject checkout when any line item exceeds available stock.
+- Decrement stock only when the Stripe webhook confirms payment succeeded.
+- Store money as integer cents throughout.
+Feature scope:
+1. Storefront — home page with featured toys; catalog with filters for category,
+   age range, and price, plus keyword search, sorting, and pagination; product
+   detail page; cart; multi-step checkout; order confirmation; order history for
+   the signed-in user; register and login pages.
+2. Admin dashboard at /admin, reachable only by admin users — create, edit, and
+   delete products and categories; upload product images to local disk storage;
+   adjust stock; list all orders and advance order status through pending, paid,
+   shipped, and delivered.
+3. Payments — a backend endpoint that creates a Stripe Checkout Session from the
+   server-side cart total, a success and a cancel page, and a webhook handler
+   that verifies the Stripe signature and marks the order paid.
+Quality requirements:
+- Validate every request body with Pydantic; return typed error responses.
+- Configure CORS for the frontend origin.
+- Seed script that inserts 5 categories and 24 realistic children's toys with
+  descriptions, ages, prices, and placeholder image paths, plus one admin user
+  and one customer user.
+- Pytest tests covering: registration, login with wrong password, admin route
+  blocked for a customer, add-to-cart, and checkout rejected on insufficient
+  stock.
+- .env.example listing every environment variable with a comment on each.
+- Dockerfile for each service plus a docker-compose.yml that brings up Postgres,
+  backend, and frontend together.
+- README with prerequisites, setup commands in order, how to run migrations and
+  the seed script, how to run tests, the two seeded logins, and how to test
+  Stripe locally with the Stripe CLI.
+### OUTPUT FORMAT ###
+Produce the output in this order:
+1. ARCHITECTURE — 10 lines or fewer: services, how they talk, auth flow, payment
+   flow.
+2. FILE TREE — the complete repository tree.
+3. DATABASE SCHEMA — each table with its columns, types, and relationships.
+4. API CONTRACT — a table with columns: Method, Path, Auth required, Purpose.
+5. CODE — every file, in dependency order (backend models, then schemas, then
+   auth, then routers, then main; then frontend entry, then state, then API
+   client, then components, then pages). Format each file as:
+   backend/app/models/product.py
+python
+   <complete file contents>
+
+6. README.md — in full, as the final file.
+Write complete file contents every time. If the response reaches its length
+limit, stop at a file boundary, state which file you stopped after, and continue
+from exactly that point when I reply "continue".
+
+Generate Synthetic Data related to Toys and Customers who are have purchased this in the past year. The data should be for 2026.
+
+Ask clarifying question using AskUserQuestion mode
+
+The spec says SQLite as the database, but docker-compose is supposed to bring up Postgres. Which do you want?
+SQLite only (Recommended)
+Where should the synthetic 2026 toys + customer purchase data go?
+Seed script + CSV exports (Recommended)
+How large should the synthetic purchase dataset be, and what period?
+50 customers / ~200 orders, Jan–Dec 2026
+Where do you want the code delivered?
+Write to C:\Vishal\Projects\ECommerce_Website (Recommended)
+
+Read a memory, edited a memory, used a tool
+Read a memory, edited a memory, used a tool
+Building into C:\Vishal\Projects\ECommerce_Website. Starting with the backend core.
+
+
+Used 12 tools
+Used 12 tools
+Can you provide me regular updates on where you are in the process?
+
+Progress — writing directly into C:\Vishal\Projects\ECommerce_Website.
+
+Done
+
+Repo scaffold, .gitignore, .env.example (every var commented)
+Backend config, DB session, security (bcrypt + JWT access/refresh), typed error handlers, deps (get_current_admin role guard)
+All 9 models: users, revoked_tokens, categories, products, product_images, cart_items, orders, order_items, payments
+Pydantic v2 schemas for every request/response
+Services: pricing (integer cents), cart, orders (stock validated at checkout, decremented only on payment confirm), Stripe wrapper
+Routers: auth, categories, products, cart, orders, checkout + webhook, admin
+main.py, Alembic env + initial migration
+Catalog data: 5 categories, 24 toys with real descriptions, ages, safety notes
+Synthetic data generator: 50 customers, 200 orders across Jan–Dec 2026, seasonality weighted, deterministic seed → 5 CSVs
+Next
+
+Seed script (loads catalog + CSVs, generates placeholder images, admin + customer logins)
+Pytest suite (5 required cases)
+Dockerfiles + docker-compose
+Frontend: Vite/TS config, Zustand stores, Axios client, components, storefront pages, admin dashboard
+README
+Install deps, run migrations + seed + tests to verify it actually runs
+I'll ping you at each of those milestones.
+
+
+Used 11 tools
+Used 11 tools
+Backend is done and verified on your machine:
+
+alembic upgrade head → schema created clean
+python -m scripts.seed --regenerate → 5 categories, 24 toys, placeholder SVGs, 50 synthetic customers, 200 orders / 391 line items / 191 payments across Jan–Dec 2026, $24,193.13 revenue
+pytest → 17 passed (registration, duplicate username, wrong password, refresh+logout revocation, change password, admin blocked for customer, admin 401 vs 403, admin product CRUD + stock, add-to-cart, browser-sent price ignored, over-stock add rejected, checkout rejected on insufficient stock, empty cart, pending order leaves stock untouched, stock decrements only on payment confirm)
+One fix along the way: .test is a reserved TLD that email-validator rejects, so seeded logins are admin@example.com / customer@example.com.
+
+Starting the frontend now — Vite/TS config, Axios client with refresh-token interceptor, Zustand auth + cart stores, then storefront pages, then the admin dashboard.
+
+
+Used 26 tools
+Used 26 tools
+Frontend is written and verified: tsc --noEmit clean across 43 files, vite build succeeds (293 kB JS / 25 kB CSS).
+
+Built: Axios client with refresh-token interceptor, Zustand auth + cart stores (guest cart in localStorage, merged server-side on sign-in), Layout/Navbar/Footer, ProductCard, filters, pagination, route guards. Pages: Home, Catalog (filters + search + sort + pagination in the URL), Product detail, Cart, 3-step Checkout, Success (polls for webhook confirmation), Cancel, Orders, Order detail, Login, Register, Account, 404. Admin: Overview with stats, Products table with inline stock +/− and a create/edit modal with image upload, Categories, Orders with status advancement.
+
+Note: I installed and built in a scratch copy, not in your folder — npm needs delete permissions the mount didn't have, and a partial install left a 115 MB node_modules behind. You approved deletion and it's being cleaned up now; your folder will have no node_modules, which is correct — you run npm install yourself per the README.
+
+Remaining: docker-compose.yml, README, and a live end-to-end smoke test of the API.
+
+
+Used 8 tools
+Used 8 tools
+Done. Everything is in C:\Vishal\Projects\ECommerce_Website — 151 files, no node_modules, no stray caches.
+
+Verified on your machine, not just written:
+
+alembic upgrade head → clean schema
+python -m scripts.seed → 5 categories, 24 toys, 24 placeholder SVGs, 2 logins, 50 synthetic customers, 200 orders / 391 line items / 191 payments, $24,193.13 of 2026 revenue
+pytest → 17 passed
+tsc --noEmit → clean; vite build → 293 kB JS / 25 kB CSS
+Live API smoke test: keyword search + category/age filters return correct counts; a browser-sent price_cents: 1 was ignored and the line priced at 4299 from the DB; checkout left stock at 64 while pending, dropped it to 62 only on payment confirm and emptied the cart; customer hitting /admin/stats → 403, admin → 200; paid → shipped accepted, shipped → paid → 409; unsigned webhook → 503
+Architecture — React SPA (Vite/TS/Tailwind/Zustand) → FastAPI/SQLAlchemy 2.x → SQLite, Alembic migrations. Auth: 30-min JWT access + 7-day refresh, Axios interceptor retries once on 401, logout denylists the refresh jti, role claim enforced by a get_current_admin dependency. Payments: checkout builds a pending order from the server cart, Stripe prices the session from persisted order rows, and only the signature-verified webhook marks it paid and decrements stock — idempotently.
+
+Business rules, where they live: services/pricing.py (integer cents throughout), services/cart_service.py (re-prices every line from products), services/order_service.py (create_pending_order validates stock, mark_order_paid is the only path that moves it).
+
+Three decisions worth knowing:
+
+Docker Compose runs backend + frontend only — no Postgres service, per your SQLite choice. SQLite lives on a named volume so it survives down.
+Dev payment mode. With STRIPE_SECRET_KEY blank, checkout skips Stripe and the frontend calls /api/checkout/dev-confirm/{order}, which runs the identical confirmation path. The app is fully exercisable before you have any keys; README §9 covers the Stripe CLI path.
+Seeded emails are admin@example.com / customer@example.com — .test is a reserved TLD that email-validator rejects. Passwords: Admin123! and Customer123!.
+Full architecture, file tree, table-by-table schema, and the 40-row API contract are in README.md §1–4.
+
+To run it: cd backend && pip install -r requirements.txt && alembic upgrade head && python -m scripts.seed && uvicorn app.main:app --reload, then cd frontend && npm install && npm run dev.
+

@@ -1,0 +1,51 @@
+customer_id,username,email,full_name,signup_date,city,state,postal_code,address_line1,children_count,youngest_child_age_months,acquisition_channel,marketing_opt_in
+1,ethan.larsen,ethan.larsen@example.com,Ethan Larsen,2026-11-28,Boston,MA,02116,117 Cedar Ln,3,85,paid_social,False
+2,owen.moreau,owen.moreau@example.com,Owen Moreau,2026-08-25,Austin,TX,78704,803 Franklin Ave,1,6,paid_social,True
+3,mia.novak,mia.novak@example.com,Mia Novak,2026-11-16,Sayreville,NJ,08872,707 Park Pl,1,38,email,False
+4,ruby.weber,ruby.weber@example.com,Ruby Weber,2026-09-21,Stamford,CT,06902,90 Park Pl,1,74,organic_search,True
+5,arjun.sandoval,arjun.sandoval@example.com,Arjun Sandoval,2026-01-28,Austin,TX,78704,739 Park Pl,1,60,organic_search,False
+6,owen.castillo,owen.castillo@example.com,Owen Castillo,2025-10-26,Seattle,WA,98109,780 Franklin Ave,2,56,referral,True
+7,lena.dubois,lena.dubois@example.com,Lena Dubois,2026-09-17,Chicago,IL,60614,836 Maple Ave,2,104,organic_search,True
+8,rosa.ahmed,rosa.ahmed@example.com,Rosa Ahmed,2026-10-14,Chicago,IL,60614,493 Washington St,1,35,direct,True
+9,yuki.novak,yuki.novak@example.com,Yuki Novak,2026-09-09,Columbus,OH,43215,585 Highland Blvd,2,45,paid_social,False
+10,yuki.castillo,yuki.castillo@example.com,Yuki Castillo,2026-07-07,Denver,CO,80203,313 Bordentown Ave,1,25,paid_social,True
+11,theo.weber,theo.weber@example.com,Theo Weber,2026-06-07,Boston,MA,02116,278 Willow Way,1,104,direct,False
+12,owen.byrne,owen.byrne@example.com,Owen Byrne,2025-08-11,Chicago,IL,60614,480 Ernston Rd,1,97,direct,True
+13,anaya.lund,anaya.lund@example.com,Anaya Lund,2026-08-03,Princeton,NJ,08540,676 Bordentown Ave,3,53,organic_search,False
+14,lena.okafor,lena.okafor@example.com,Lena Okafor,2026-02-01,Philadelphia,PA,19103,474 Franklin Ave,2,113,organic_search,False
+15,omar.rivera,omar.rivera@example.com,Omar Rivera,2025-10-09,Alexandria,VA,22314,696 Park Pl,1,46,paid_social,True
+16,caleb.sandoval,caleb.sandoval@example.com,Caleb Sandoval,2026-09-08,Austin,TX,78704,496 Franklin Ave,1,82,direct,True
+17,liam.ferreira,liam.ferreira@example.com,Liam Ferreira,2025-07-26,Columbus,OH,43215,813 Franklin Ave,1,58,email,True
+18,ava.brooks,ava.brooks@example.com,Ava Brooks,2026-07-03,Sayreville,NJ,08872,64 Park Pl,2,125,direct,True
+19,maya.castillo,maya.castillo@example.com,Maya Castillo,2026-08-11,Queens,NY,11375,947 Ernston Rd,1,65,paid_social,False
+20,rohan.dubois,rohan.dubois@example.com,Rohan Dubois,2026-10-11,Boston,MA,02116,481 Franklin Ave,1,96,organic_search,True
+21,ava.petrov,ava.petrov@example.com,Ava Petrov,2025-11-18,Chicago,IL,60614,965 Maple Ave,1,102,paid_social,True
+22,emeka.iqbal,emeka.iqbal@example.com,Emeka Iqbal,2025-10-07,Sayreville,NJ,08872,816 Orchard St,3,23,organic_search,False
+23,farah.kowalski,farah.kowalski@example.com,Farah Kowalski,2026-02-13,Stamford,CT,06902,324 Washington St,1,39,email,False
+24,lena.haddad,lena.haddad@example.com,Lena Haddad,2025-10-16,Philadelphia,PA,19103,467 Ernston Rd,2,73,direct,False
+25,daniel.silva,daniel.silva@example.com,Daniel Silva,2026-08-21,Sayreville,NJ,08872,350 Highland Blvd,2,112,direct,False
+26,amelia.mehta,amelia.mehta@example.com,Amelia Mehta,2025-10-22,Seattle,WA,98109,598 Orchard St,1,85,paid_social,True
+27,nadia.adeyemi,nadia.adeyemi@example.com,Nadia Adeyemi,2026-10-09,Jersey City,NJ,07302,698 Orchard St,1,106,organic_search,False
+28,chloe.rivera,chloe.rivera@example.com,Chloe Rivera,2025-08-24,Columbus,OH,43215,833 Washington St,2,19,email,True
+29,sofia.haddad,sofia.haddad@example.com,Sofia Haddad,2026-05-09,Chicago,IL,60614,76 Maple Ave,1,120,referral,True
+30,aarav.nguyen,aarav.nguyen@example.com,Aarav Nguyen,2026-05-04,Edison,NJ,08817,108 Orchard St,2,125,direct,True
+31,theo.romano,theo.romano@example.com,Theo Romano,2026-10-02,Columbus,OH,43215,958 Highland Blvd,1,33,paid_social,True
+32,emeka.iqbal2,emeka.iqbal2@example.com,Emeka Iqbal,2026-09-22,Edison,NJ,08817,957 Bordentown Ave,1,127,direct,True
+33,rosa.ferreira,rosa.ferreira@example.com,Rosa Ferreira,2025-11-11,Chicago,IL,60614,308 Ernston Rd,1,59,organic_search,False
+34,talia.larsen,talia.larsen@example.com,Talia Larsen,2026-02-06,Jersey City,NJ,07302,645 Ernston Rd,1,22,email,True
+35,arjun.haddad,arjun.haddad@example.com,Arjun Haddad,2026-03-12,Sayreville,NJ,08872,437 Highland Blvd,1,105,email,True
+36,isla.kim,isla.kim@example.com,Isla Kim,2025-11-18,Boston,MA,02116,712 Orchard St,1,38,direct,True
+37,amelia.kowalski,amelia.kowalski@example.com,Amelia Kowalski,2026-05-11,Boston,MA,02116,153 Franklin Ave,1,28,paid_social,False
+38,maya.moreau,maya.moreau@example.com,Maya Moreau,2026-09-25,Brooklyn,NY,11215,772 Park Pl,1,113,organic_search,False
+39,hana.nguyen,hana.nguyen@example.com,Hana Nguyen,2026-03-24,Jersey City,NJ,07302,939 Highland Blvd,2,52,referral,True
+40,leo.larsen,leo.larsen@example.com,Leo Larsen,2026-06-15,Seattle,WA,98109,664 Willow Way,2,66,direct,False
+41,hassan.bennett,hassan.bennett@example.com,Hassan Bennett,2026-03-16,Princeton,NJ,08540,927 Maple Ave,3,110,referral,True
+42,lena.weber,lena.weber@example.com,Lena Weber,2026-02-10,Sayreville,NJ,08872,393 Orchard St,2,23,paid_social,True
+43,amelia.fischer,amelia.fischer@example.com,Amelia Fischer,2026-10-10,Jersey City,NJ,07302,598 Maple Ave,3,54,email,False
+44,arjun.byrne,arjun.byrne@example.com,Arjun Byrne,2026-02-03,Princeton,NJ,08540,157 Highland Blvd,1,39,organic_search,False
+45,clara.weber,clara.weber@example.com,Clara Weber,2025-08-10,Jersey City,NJ,07302,566 Bordentown Ave,1,130,email,False
+46,iris.shah,iris.shah@example.com,Iris Shah,2026-08-14,Seattle,WA,98109,376 Orchard St,1,72,organic_search,True
+47,rohan.kim,rohan.kim@example.com,Rohan Kim,2026-09-22,Sayreville,NJ,08872,915 Maple Ave,2,14,email,True
+48,rohan.romano,rohan.romano@example.com,Rohan Romano,2026-02-11,Alexandria,VA,22314,508 Ernston Rd,2,99,organic_search,True
+49,hassan.petrov,hassan.petrov@example.com,Hassan Petrov,2026-08-04,Edison,NJ,08817,580 Orchard St,1,51,paid_social,True
+50,felix.mehta,felix.mehta@example.com,Felix Mehta,2025-06-26,Edison,NJ,08817,518 Bordentown Ave,1,90,organic_search,True

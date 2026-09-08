@@ -1,0 +1,25 @@
+product_slug,product_name,category_slug,category_name,brand,price_cents,price_usd,stock_quantity,min_age_months,max_age_months,is_featured
+rainbow-rise-wooden-block-set,Rainbow Rise Wooden Block Set (100 pieces),building-construction,Building & Construction,Maple & Moss,4299,42.99,64,24,96,True
+magnatile-explorer-starter-pack,MagnaTile Explorer Starter Pack (72 pieces),building-construction,Building & Construction,BrightBuild,5999,59.99,48,36,120,True
+gravity-loop-marble-run-deluxe,Gravity Loop Marble Run (Deluxe),building-construction,Building & Construction,BrightBuild,4799,47.99,37,48,144,False
+junior-engineer-nuts-bolts-workshop,Junior Engineer Nuts & Bolts Workshop,building-construction,Building & Construction,Tinker Crew,3499,34.99,55,36,96,False
+castle-quest-brick-set,Castle Quest Brick Set (480 pieces),building-construction,Building & Construction,Blockworks,6499,64.99,26,72,168,False
+bramble-organic-cotton-bear,Bramble the Organic Cotton Bear,dolls-plush,Dolls & Plush,Hollow Hill,2999,29.99,88,0,96,True
+meadow-friends-rag-doll-iris,Meadow Friends Rag Doll — Iris,dolls-plush,Dolls & Plush,Hollow Hill,3299,32.99,41,18,96,False
+little-kitchen-play-cafe-set,Little Kitchen Play Café Set,dolls-plush,Dolls & Plush,Maple & Moss,5499,54.99,33,36,108,True
+dreamlight-nursery-doll-cot,Dreamlight Nursery Doll & Cot,dolls-plush,Dolls & Plush,Little Lane,4499,44.99,29,36,96,False
+pocket-pals-mini-plush-set,Pocket Pals Mini Plush Set (6 animals),dolls-plush,Dolls & Plush,Hollow Hill,2199,21.99,96,24,84,False
+woodland-match-memory-game,Woodland Match Memory Game,games-puzzles,Games & Puzzles,Fox & Feather,1799,17.99,120,36,96,False
+sunny-farm-floor-puzzle,Sunny Farm 48-Piece Floor Puzzle,games-puzzles,Games & Puzzles,Fox & Feather,1599,15.99,84,36,84,False
+rocket-race-family-board-game,Rocket Race Family Board Game,games-puzzles,Games & Puzzles,Tabletop Junior,2899,28.99,52,60,168,True
+story-cubes-adventure-dice,Story Cubes Adventure Dice,games-puzzles,Games & Puzzles,Tabletop Junior,1299,12.99,143,48,168,False
+deep-sea-200-piece-jigsaw,Deep Sea 200-Piece Jigsaw,games-puzzles,Games & Puzzles,Fox & Feather,1899,18.99,61,84,168,False
+trailblazer-wooden-balance-bike,Trailblazer Wooden Balance Bike,outdoor-active-play,Outdoor & Active Play,Rove,8999,89.99,22,24,60,True
+backyard-bounce-jumbo-play-ball-set,Backyard Bounce Jumbo Play Ball Set,outdoor-active-play,Outdoor & Active Play,Rove,2499,24.99,74,24,120,False
+splash-zone-water-table,Splash Zone Water Table,outdoor-active-play,Outdoor & Active Play,Sunbeam Play,6799,67.99,18,18,72,False
+sidewalk-chalk-artist-kit,Sidewalk Chalk Artist Kit (48 sticks),outdoor-active-play,Outdoor & Active Play,Sunbeam Play,1499,14.99,110,36,144,False
+junior-archery-target-set,Junior Archery Target Set (foam-tipped),outdoor-active-play,Outdoor & Active Play,Rove,3799,37.99,31,72,168,False
+codebot-screen-free-coding-robot,CodeBot Screen-Free Coding Robot,stem-learning,STEM & Learning,Tinker Crew,7999,79.99,24,48,120,True
+volcano-crystal-science-lab,Volcano & Crystal Science Lab,stem-learning,STEM & Learning,Tinker Crew,3299,32.99,47,72,156,False
+stargazer-beginner-telescope,Stargazer Beginner Telescope,stem-learning,STEM & Learning,Northlight,9499,94.99,15,96,192,True
+alphabet-adventure-magnetic-letters,Alphabet Adventure Magnetic Letters,stem-learning,STEM & Learning,Little Lane,2299,22.99,92,36,84,False
