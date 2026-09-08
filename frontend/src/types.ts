@@ -120,7 +120,7 @@ export interface Payment {
 export interface Order {
   id: number
   order_number: string
-  user_id: number
+  user_id: number | null
   status: OrderStatus
   subtotal_cents: number
   shipping_cents: number
@@ -135,6 +135,13 @@ export interface Order {
   shipping_state: string
   shipping_postal_code: string
   shipping_country: string
+  billing_name: string | null
+  billing_line1: string | null
+  billing_line2: string | null
+  billing_city: string | null
+  billing_state: string | null
+  billing_postal_code: string | null
+  billing_country: string | null
   placed_at: string | null
   paid_at: string | null
   shipped_at: string | null
@@ -189,4 +196,40 @@ export interface CatalogQuery {
   sort?: 'newest' | 'price_asc' | 'price_desc' | 'name_asc' | 'name_desc'
   page?: number
   page_size?: number
+}
+
+export type CardBrand = 'visa' | 'mastercard' | 'discover' | 'amex'
+
+export interface GuestAddressInput {
+  name: string
+  line1: string
+  line2?: string | null
+  city: string
+  state: string
+  postal_code: string
+  country: string
+}
+
+export interface CardDetailsInput {
+  brand: CardBrand
+  number: string
+  name_on_card: string
+  exp_month: number
+  exp_year: number
+  cvv: string
+  postal_code: string
+}
+
+export interface GuestCheckoutRequestBody {
+  contact_email: string
+  billing_address: GuestAddressInput
+  card: CardDetailsInput
+  same_as_billing: boolean
+  shipping_address?: GuestAddressInput | null
+  items: { product_id: number; quantity: number }[]
+}
+
+export interface GuestCheckoutResponseBody {
+  order: Order
+  email_sent: boolean
 }
