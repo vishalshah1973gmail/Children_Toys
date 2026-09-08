@@ -1,5 +1,7 @@
 """Stripe Checkout session creation and the payment webhook."""
 
+import logging
+
 from fastapi import APIRouter, Depends, Header, Request, status
 from sqlalchemy.orm import Session
 
@@ -9,11 +11,13 @@ from app.core.errors import api_error, not_found
 from app.db.session import get_db
 from app.models.order import OrderStatus
 from app.models.user import User
+from app.schemas.checkout_guest import GuestCheckoutRequest, GuestCheckoutResponse
 from app.schemas.common import Message
 from app.schemas.order import CheckoutRequest, CheckoutSessionResponse, OrderRead
-from app.services import order_service, stripe_service
+from app.services import email_service, order_service, stripe_service
 
 router = APIRouter(tags=["checkout"])
+logger = logging.getLogger(__name__)
 
 
 @router.post(
@@ -60,6 +64,30 @@ def create_checkout_session(
         checkout_url=session.url,
         session_id=session.id,
     )
+
+
+@router.post(
+    "/checkout/guest",
+    response_model=GuestCheckoutResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def guest_checkout(
+    payload: GuestCheckoutRequest,
+    db: Session = Depends(get_db),
+) -> GuestCheckoutResponse:
+    """Place and simulate-pay a guest order in one request. No auth, no Stripe."""
+    order = order_service.create_guest_order(db, payload)
+    db.commit()
+    db.refresh(order)
+
+    email_sent = True
+    try:
+        email_service.send_receipt(order)
+    except Exception as exc:  # noqa: BLE001 - a failed email must not fail the order
+        logger.warning("Guest receipt email failed for %s: %s", order.order_number, exc)
+        email_sent = False
+
+    return GuestCheckoutResponse(order=OrderRead.model_validate(order), email_sent=email_sent)
 
 
 @router.post("/checkout/dev-confirm/{order_number}", response_model=OrderRead)
