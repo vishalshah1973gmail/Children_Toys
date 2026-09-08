@@ -100,50 +100,78 @@ def create_pending_order(db: Session, user: User, payload: CheckoutRequest) -> O
 
 def create_guest_order(
     db: Session,
-    payload: "GuestCheckoutRequest",
+    payload: GuestCheckoutRequest,
     *,
     today: date | None = None,
 ) -> Order:
     """Create and immediately mark-paid a guest order. No Stripe call ever.
 
-    Raises 400 (empty cart), 409 (stock), or 422 (invalid_card).
+    Raises 400 (empty cart or missing shipping address), 409 (stock), or
+    422 (invalid_card).
     """
     if not payload.items:
-        raise api_error(status.HTTP_400_BAD_REQUEST, "empty_cart", "Your cart is empty")
+        raise api_error(
+            status.HTTP_400_BAD_REQUEST,
+            "empty_cart",
+            "Your cart is empty",
+        )
+
+    if not payload.same_as_billing and payload.shipping_address is None:
+        raise api_error(
+            status.HTTP_400_BAD_REQUEST,
+            "missing_shipping_address",
+            "Shipping address is required when not using billing address",
+            field="shipping_address",
+        )
 
     products: dict[int, Product] = {}
+    quantities: dict[int, int] = {}
     for line in payload.items:
         product = db.get(Product, line.product_id)
         if product is None or not product.is_active:
             raise api_error(
-                status.HTTP_409_CONFLICT, "product_unavailable",
+                status.HTTP_409_CONFLICT,
+                "product_unavailable",
                 f"Product {line.product_id} is no longer available",
             )
-        if line.quantity > product.stock_quantity:
+        products[line.product_id] = product
+        quantities[line.product_id] = quantities.get(line.product_id, 0) + line.quantity
+
+    for product_id, total_quantity in quantities.items():
+        product = products[product_id]
+        if total_quantity > product.stock_quantity:
             raise api_error(
-                status.HTTP_409_CONFLICT, "insufficient_stock",
+                status.HTTP_409_CONFLICT,
+                "insufficient_stock",
                 (
                     f"Only {product.stock_quantity} of '{product.name}' left in stock "
-                    f"(you asked for {line.quantity})"
+                    f"(you asked for {total_quantity})"
                 ),
                 field="quantity",
             )
-        products[line.product_id] = product
 
     card = payload.card
     card_errors = card_validation.validate_card(
-        brand=card.brand, number=card.number, exp_month=card.exp_month,
-        exp_year=card.exp_year, cvv=card.cvv, postal_code=card.postal_code,
+        brand=card.brand,
+        number=card.number,
+        exp_month=card.exp_month,
+        exp_year=card.exp_year,
+        cvv=card.cvv,
+        postal_code=card.postal_code,
         today=today or datetime.now(timezone.utc).date(),
     )
     if card_errors:
         first = card_errors[0]
         raise api_error(
-            status.HTTP_422_UNPROCESSABLE_ENTITY, "invalid_card", first.message,
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            "invalid_card",
+            first.message,
             field=first.field,
         )
 
-    subtotal = sum(products[line.product_id].price_cents * line.quantity for line in payload.items)
+    subtotal = sum(
+        products[line.product_id].price_cents * line.quantity for line in payload.items
+    )
     totals = totals_for(subtotal)
     now = datetime.now(timezone.utc)
     billing = payload.billing_address

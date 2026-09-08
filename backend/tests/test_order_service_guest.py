@@ -103,6 +103,41 @@ def test_create_guest_order_rejects_insufficient_stock(
     assert excinfo.value.detail["code"] == "insufficient_stock"
 
 
+def test_create_guest_order_rejects_missing_shipping_address(
+    db: Session, product_factory
+) -> None:
+    product = product_factory(slug="guest-toy-5", price_cents=1000, stock=5)
+    with pytest.raises(HTTPException) as excinfo:
+        order_service.create_guest_order(
+            db,
+            _request(product.id, same_as_billing=False, shipping_address=None),
+            today=date(2026, 9, 8),
+        )
+    assert excinfo.value.detail["code"] == "missing_shipping_address"
+
+
+def test_create_guest_order_aggregates_duplicate_lines_before_stock_check(
+    db: Session, product_factory
+) -> None:
+    product = product_factory(slug="guest-toy-6", price_cents=1000, stock=1)
+    with pytest.raises(HTTPException) as excinfo:
+        order_service.create_guest_order(
+            db,
+            _request(
+                product.id,
+                items=[
+                    GuestCheckoutItem(product_id=product.id, quantity=1),
+                    GuestCheckoutItem(product_id=product.id, quantity=1),
+                ],
+            ),
+            today=date(2026, 9, 8),
+        )
+    assert excinfo.value.detail["code"] == "insufficient_stock"
+
+    db.expire_all()
+    assert db.get(Product, product.id).stock_quantity == 1
+
+
 def test_create_guest_order_rejects_a_bad_card(db: Session, product_factory) -> None:
     product = product_factory(slug="guest-toy-4", price_cents=1000, stock=5)
     bad_card = GOOD_CARD.model_copy(update={"number": "4242424242424241"})
