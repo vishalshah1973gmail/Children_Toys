@@ -7,7 +7,7 @@ Two rules live here and nowhere else:
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from fastapi import status
 from sqlalchemy import select
@@ -18,8 +18,11 @@ from app.core.errors import api_error
 from app.core.utils import generate_order_number
 from app.models.order import Order, OrderItem, OrderStatus
 from app.models.payment import Payment, PaymentStatus
+from app.models.product import Product
 from app.models.user import User
+from app.schemas.checkout_guest import GuestCheckoutRequest
 from app.schemas.order import CheckoutRequest
+from app.services import card_validation
 from app.services.cart_service import load_cart_items
 from app.services.pricing import totals_for
 
@@ -89,6 +92,116 @@ def create_pending_order(db: Session, user: User, payload: CheckoutRequest) -> O
                 line_total_cents=product.price_cents * item.quantity,
             )
         )
+
+    db.add(order)
+    db.flush()
+    return order
+
+
+def create_guest_order(
+    db: Session,
+    payload: "GuestCheckoutRequest",
+    *,
+    today: date | None = None,
+) -> Order:
+    """Create and immediately mark-paid a guest order. No Stripe call ever.
+
+    Raises 400 (empty cart), 409 (stock), or 422 (invalid_card).
+    """
+    if not payload.items:
+        raise api_error(status.HTTP_400_BAD_REQUEST, "empty_cart", "Your cart is empty")
+
+    products: dict[int, Product] = {}
+    for line in payload.items:
+        product = db.get(Product, line.product_id)
+        if product is None or not product.is_active:
+            raise api_error(
+                status.HTTP_409_CONFLICT, "product_unavailable",
+                f"Product {line.product_id} is no longer available",
+            )
+        if line.quantity > product.stock_quantity:
+            raise api_error(
+                status.HTTP_409_CONFLICT, "insufficient_stock",
+                (
+                    f"Only {product.stock_quantity} of '{product.name}' left in stock "
+                    f"(you asked for {line.quantity})"
+                ),
+                field="quantity",
+            )
+        products[line.product_id] = product
+
+    card = payload.card
+    card_errors = card_validation.validate_card(
+        brand=card.brand, number=card.number, exp_month=card.exp_month,
+        exp_year=card.exp_year, cvv=card.cvv, postal_code=card.postal_code,
+        today=today or datetime.now(timezone.utc).date(),
+    )
+    if card_errors:
+        first = card_errors[0]
+        raise api_error(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, "invalid_card", first.message,
+            field=first.field,
+        )
+
+    subtotal = sum(products[line.product_id].price_cents * line.quantity for line in payload.items)
+    totals = totals_for(subtotal)
+    now = datetime.now(timezone.utc)
+    billing = payload.billing_address
+    shipping = billing if payload.same_as_billing else payload.shipping_address
+
+    order = Order(
+        order_number=generate_order_number(now),
+        user_id=None,
+        status=OrderStatus.PAID,
+        currency=settings.stripe_currency,
+        contact_email=str(payload.contact_email),
+        billing_name=billing.name,
+        billing_line1=billing.line1,
+        billing_line2=billing.line2,
+        billing_city=billing.city,
+        billing_state=billing.state,
+        billing_postal_code=billing.postal_code,
+        billing_country=billing.country.upper(),
+        shipping_name=shipping.name,
+        shipping_line1=shipping.line1,
+        shipping_line2=shipping.line2,
+        shipping_city=shipping.city,
+        shipping_state=shipping.state,
+        shipping_postal_code=shipping.postal_code,
+        shipping_country=shipping.country.upper(),
+        placed_at=now,
+        paid_at=now,
+        **totals,
+    )
+
+    for line in payload.items:
+        product = products[line.product_id]
+        order.items.append(
+            OrderItem(
+                product_id=product.id,
+                product_name=product.name,
+                product_slug=product.slug,
+                image_url=product.primary_image_url,
+                unit_price_cents=product.price_cents,
+                quantity=line.quantity,
+                line_total_cents=product.price_cents * line.quantity,
+            )
+        )
+        product.stock_quantity -= line.quantity
+
+    digits = "".join(char for char in card.number if char.isdigit())
+    order.payments.append(
+        Payment(
+            provider="guest_form",
+            amount_cents=totals["total_cents"],
+            currency=settings.stripe_currency,
+            status=PaymentStatus.SUCCEEDED,
+            card_brand=card.brand,
+            card_last4=digits[-4:],
+            card_exp_month=card.exp_month,
+            card_exp_year=card.exp_year,
+        )
+    )
 
     db.add(order)
     db.flush()
