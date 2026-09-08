@@ -125,13 +125,24 @@ export default function CartPage() {
           </div>
         </dl>
 
-        <button
-          type="button"
-          className="btn-primary mt-5 w-full"
-          onClick={() => navigate(user ? '/checkout' : '/login', { state: { from: '/checkout' } })}
-        >
-          {user ? 'Proceed to checkout' : 'Sign in to check out'}
-        </button>
+        <div className="mt-5 space-y-2">
+          <button
+            type="button"
+            className="btn-primary w-full"
+            onClick={() => navigate(user ? '/checkout' : '/login', { state: { from: '/checkout' } })}
+          >
+            {user ? 'Proceed to checkout' : 'Sign in to check out'}
+          </button>
+          {!user && (
+            <button
+              type="button"
+              className="btn-secondary w-full"
+              onClick={() => navigate('/checkout/guest')}
+            >
+              Checkout as guest
+            </button>
+          )}
+        </div>
 
         <p className="mt-3 text-xs text-ink-700">
           Prices and stock are confirmed on the server before payment is taken.
