@@ -176,7 +176,8 @@ export default function GuestCheckoutPage() {
                 <input className="input" placeholder="Zip" required
                   value={billing.postal_code} onChange={(event) => updateBilling('postal_code', event.target.value)} />
               </div>
-              <button type="button" className="btn-primary" disabled={!email || !billing.name || !billing.line1}
+              <button type="button" className="btn-primary"
+                disabled={!email || !billing.name || !billing.line1 || !billing.city || !billing.state || !billing.postal_code}
                 onClick={() => setStep('payment')}>
                 Continue to payment
               </button>
@@ -216,9 +217,9 @@ export default function GuestCheckoutPage() {
                 <input className="input" placeholder="Zip" required value={cardZip}
                   onChange={(event) => setCardZip(event.target.value)} />
               </div>
-              {(fieldErrors.exp_year || fieldErrors.cvv || fieldErrors.postal_code) && (
+              {(fieldErrors.exp_month || fieldErrors.exp_year || fieldErrors.cvv || fieldErrors.postal_code) && (
                 <p className="text-sm text-red-600">
-                  {fieldErrors.exp_year || fieldErrors.cvv || fieldErrors.postal_code}
+                  {fieldErrors.exp_month || fieldErrors.exp_year || fieldErrors.cvv || fieldErrors.postal_code}
                 </p>
               )}
               <div className="flex gap-3">
@@ -262,7 +263,7 @@ export default function GuestCheckoutPage() {
               <div className="flex gap-3">
                 <button type="button" className="btn-secondary" onClick={() => setStep('payment')}>Back</button>
                 <button type="button" className="btn-primary"
-                  disabled={!sameAsBilling && (!shipping.name || !shipping.line1)}
+                  disabled={!sameAsBilling && (!shipping.name || !shipping.line1 || !shipping.city || !shipping.state || !shipping.postal_code)}
                   onClick={() => setStep('review')}>
                   Review order
                 </button>
