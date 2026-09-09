@@ -1,5 +1,12 @@
 import { api } from './client'
-import type { CheckoutSession, Order, Paged, ShippingAddressInput } from '../types'
+import type {
+  CheckoutSession,
+  GuestCheckoutRequestBody,
+  GuestCheckoutResponseBody,
+  Order,
+  Paged,
+  ShippingAddressInput,
+} from '../types'
 
 export const ordersApi = {
   async list(page = 1, pageSize = 10): Promise<Paged<Order>> {
@@ -24,6 +31,10 @@ export const ordersApi = {
   },
   async devConfirm(orderNumber: string): Promise<Order> {
     const { data } = await api.post<Order>(`/checkout/dev-confirm/${orderNumber}`)
+    return data
+  },
+  async guestCheckout(body: GuestCheckoutRequestBody): Promise<GuestCheckoutResponseBody> {
+    const { data } = await api.post<GuestCheckoutResponseBody>('/checkout/guest', body)
     return data
   },
 }

@@ -73,7 +73,7 @@ class OrderRead(BaseModel):
 
     id: int
     order_number: str
-    user_id: int
+    user_id: int | None
     status: OrderStatus
     subtotal_cents: int
     shipping_cents: int
@@ -88,6 +88,13 @@ class OrderRead(BaseModel):
     shipping_state: str
     shipping_postal_code: str
     shipping_country: str
+    billing_name: str | None = None
+    billing_line1: str | None = None
+    billing_line2: str | None = None
+    billing_city: str | None = None
+    billing_state: str | None = None
+    billing_postal_code: str | None = None
+    billing_country: str | None = None
     placed_at: datetime | None = None
     paid_at: datetime | None = None
     shipped_at: datetime | None = None

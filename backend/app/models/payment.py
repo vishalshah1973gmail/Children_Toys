@@ -46,4 +46,9 @@ class Payment(Base, TimestampMixin):
     )
     failure_reason: Mapped[str | None] = mapped_column(Text)
 
+    card_brand: Mapped[str | None] = mapped_column(String(20))
+    card_last4: Mapped[str | None] = mapped_column(String(4))
+    card_exp_month: Mapped[int | None] = mapped_column(Integer)
+    card_exp_year: Mapped[int | None] = mapped_column(Integer)
+
     order: Mapped["Order"] = relationship(back_populates="payments")
