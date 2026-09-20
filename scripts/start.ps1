@@ -82,12 +82,12 @@ if (-not (Test-AlreadyRunning $FrontendPidFile "Frontend")) {
 
 Write-Host "Waiting for backend to become healthy..."
 $healthy = $false
-for ($i = 0; $i -lt 45; $i++) {
+for ($i = 0; $i -lt 150; $i++) {
     try {
-        $response = Invoke-WebRequest -Uri "http://localhost:8000/health" -UseBasicParsing -TimeoutSec 2
+        $response = Invoke-WebRequest -Uri "http://localhost:8000/health" -UseBasicParsing -TimeoutSec 1
         if ($response.StatusCode -eq 200) { $healthy = $true; break }
     } catch {}
-    Start-Sleep -Seconds 1
+    Start-Sleep -Milliseconds 300
 }
 
 if ($healthy) {

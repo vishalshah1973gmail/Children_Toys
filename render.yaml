@@ -1,0 +1,57 @@
+# Render Blueprint — deploy with "New > Blueprint" pointing at this repo.
+#
+# Backend stays on the free web-service plan (sleeps after 15 min idle,
+# auto-wakes on next request — URL never changes). The database is the paid
+# piece: Postgres Starter (~$7/mo) keeps data past Render's 30-day free-tier
+# database expiry and past any backend restart/redeploy.
+databases:
+  - name: toybox-db
+    plan: starter
+    databaseName: toybox
+    user: toybox
+
+services:
+  - type: web
+    name: toybox-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: APP_NAME
+        value: ToyBox
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: toybox-db
+          property: connectionString
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "7"
+      - key: CORS_ORIGINS
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: ALLOW_DEV_PAYMENT
+        value: "true"
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_APP_PASSWORD
+        sync: false
+      - key: EMAIL_FROM
+        sync: false

@@ -14,9 +14,17 @@ from app.core.config import settings
 from app.models.order import Order
 
 
+def _absolute_image_url(image_url: str | None) -> str:
+    if not image_url:
+        return ""
+    if image_url.startswith("http"):
+        return image_url
+    return f"{settings.public_base_url}{image_url if image_url.startswith('/') else '/' + image_url}"
+
+
 def _render_html(order: Order) -> str:
     rows = "".join(
-        f"<tr><td><img src='{item.image_url or ''}' width='48' /></td>"
+        f"<tr><td><img src='{_absolute_image_url(item.image_url)}' width='48' /></td>"
         f"<td>{item.product_name}</td><td>x{item.quantity}</td>"
         f"<td>${item.line_total_cents / 100:.2f}</td></tr>"
         for item in order.items

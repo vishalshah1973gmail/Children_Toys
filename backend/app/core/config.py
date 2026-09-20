@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "sqlite:///./app.db"
 
+    # Public URL of this backend, used to build absolute links (e.g. images in emails)
+    public_base_url: str = "http://localhost:8000"
+
     # Security
     jwt_secret_key: str = "change-me-to-a-long-random-string"
     jwt_algorithm: str = "HS256"
