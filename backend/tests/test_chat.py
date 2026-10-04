@@ -90,3 +90,43 @@ def test_service_parses_reply_and_rejects_malformed(monkeypatch):
     monkeypatch.setattr(chat_service, "_http_client", lambda: make_client({}, status=500))
     with pytest.raises(chat_service.ChatUnavailable):
         asyncio.run(chat_service.ask_agent("hello", "abcd1234"))
+
+
+def _timeout_handler(request):
+    import httpx
+
+    raise httpx.ReadTimeout("t")
+
+
+def _not_json_handler(request):
+    import httpx
+
+    return httpx.Response(200, content=b"not json")
+
+
+def _non_dict_handler(request):
+    import httpx
+
+    return httpx.Response(200, json=["x"])
+
+
+@pytest.mark.parametrize(
+    "handler",
+    [_timeout_handler, _not_json_handler, _non_dict_handler],
+    ids=["timeout", "non_json", "non_dict_json"],
+)
+def test_service_failures_raise_chat_unavailable_and_are_logged(monkeypatch, caplog, handler):
+    import asyncio
+    import logging
+
+    import httpx
+
+    monkeypatch.setattr(
+        chat_service,
+        "_http_client",
+        lambda: httpx.AsyncClient(transport=httpx.MockTransport(handler)),
+    )
+    with caplog.at_level(logging.ERROR, logger="app.services.chat_service"):
+        with pytest.raises(chat_service.ChatUnavailable):
+            asyncio.run(chat_service.ask_agent("hello", "abcd1234"))
+    assert any(record.levelno == logging.ERROR for record in caplog.records)
