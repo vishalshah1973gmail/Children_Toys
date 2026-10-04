@@ -549,16 +549,45 @@ The committed `products.md` uses `localhost` links, so pass the public site URL
 when exporting for a deployed store. `docs/chatbot-kb/_crawl/` is raw crawl
 scratch and is not ingested.
 
+**Lyzr upload set.** Upload docs `00` to `08` and `products.md`. Do not upload
+`test-questions.md` (it is a checking list, not knowledge) or
+`docs/chatbot-kb/_crawl/` (raw scratch that contains demo logins). Chunking by
+heading drops the "prices and stock are a snapshot" note from product chunks, so
+the agent's system prompt must carry it:
+
+```text
+You are the ToyBox store assistant. Answer shopper questions using only the attached knowledge base.
+If the answer is not in the knowledge base, say you don't know and suggest the Feedback page on the site.
+You cannot look up orders, change accounts, or process refunds. Prices and stock come from a snapshot and may have changed; say so when quoting them.
+Keep replies short, friendly and plain text.
+```
+
+**Feedback page dependency.** The knowledge pack (docs 00, 06, 07, 08) and the
+agent prompt send shoppers to the Feedback page when the bot cannot help. The
+`/feedback` route, the header link, `FeedbackPage.tsx` and
+`VITE_N8N_FEEDBACK_FORM_URL` are not on this branch; they exist only in
+uncommitted work. Land that work first or in the same merge, otherwise those
+answers lead to the 404 page.
+
 **Status.** The Lyzr request and response shape in `chat_service.py` (lines
 tagged `# LYZR SHAPE`) has not yet been confirmed against a live Lyzr account.
 
 **Before deploying.**
 
-* The rate limiter keys on the client IP. Behind Render's proxy, uvicorn does not
-  trust `X-Forwarded-For` by default, so all visitors would share one key and a
-  single global cap of 20 messages a minute. Set `FORWARDED_ALLOW_IPS=*` in the
-  Render environment (or add `--forwarded-allow-ips='*'` to the Dockerfile
-  `CMD`) first.
+* **Not implemented yet: the rate limiter's client IP.** Do not set
+  `FORWARDED_ALLOW_IPS=*` (or `--forwarded-allow-ips='*'`). In the pinned uvicorn
+  0.32.1, `*` makes the client IP the left-most `X-Forwarded-For` entry, which
+  the client supplies. Unless Render's edge strips an incoming `X-Forwarded-For`,
+  a caller can send a new value with every request, get a fresh limiter key each
+  time, bypass the paid-API cap and grow the limiter's in-memory dict forever.
+  Without trusting the proxy, all visitors share one key and one global cap of
+  20 messages a minute. Before going public, key the limiter on the right-most
+  `X-Forwarded-For` entry (the hop the platform appended) with a small helper in
+  `backend/app/routers/chat.py`, or set `forwarded-allow-ips` to the platform's
+  actual proxy range. After deploying, send a forged `X-Forwarded-For` and check
+  which key the limiter resolves. Also add a global per-minute and per-day
+  ceiling or a Lyzr-side spend cap, evict empty limiter keys, and consider
+  keying IPv6 clients by /64.
 * The login page prints the seeded demo logins. That is fine locally, but remove
   it before any public deployment, and never put those credentials in the
   knowledge base.
