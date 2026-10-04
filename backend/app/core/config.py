@@ -64,6 +64,13 @@ class Settings(BaseSettings):
     smtp_app_password: str = ""
     email_from: str = ""
 
+    # Chatbot (Lyzr agent proxy)
+    lyzr_api_key: str = ""
+    lyzr_agent_id: str = ""
+    lyzr_api_url: str = "https://agent-prod.studio.lyzr.ai/v3/inference/chat/"
+    lyzr_timeout_seconds: float = 45.0
+    chat_rate_limit_per_minute: int = 20
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def _split_origins(cls, value: object) -> object:

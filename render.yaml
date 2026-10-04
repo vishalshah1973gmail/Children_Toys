@@ -55,3 +55,7 @@ services:
         sync: false
       - key: EMAIL_FROM
         sync: false
+      - key: LYZR_API_KEY
+        sync: false
+      - key: LYZR_AGENT_ID
+        sync: false

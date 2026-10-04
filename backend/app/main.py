@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
 from app.core.errors import register_exception_handlers
-from app.routers import admin, auth, cart, categories, checkout, orders, products
+from app.routers import admin, auth, cart, categories, chat, checkout, orders, products
 
 app = FastAPI(
     title=f"{settings.app_name} API",
@@ -45,6 +45,7 @@ for router in (
     cart.router,
     orders.router,
     checkout.router,
+    chat.router,
     admin.router,
 ):
     app.include_router(router, prefix=settings.api_prefix)
