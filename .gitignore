@@ -36,3 +36,6 @@ Thumbs.db
 # start/stop script runtime state
 scripts/.pids/
 scripts/logs/
+
+# Raw chatbot crawl notes: scratch data and demo logins, never commit or upload
+docs/chatbot-kb/_crawl/
