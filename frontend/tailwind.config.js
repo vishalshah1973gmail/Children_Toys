@@ -24,6 +24,7 @@ export default {
       },
       fontFamily: {
         display: ['Georgia', 'Cambria', 'serif'],
+        chat: ['Nunito', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
   },

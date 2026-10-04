@@ -233,3 +233,15 @@ export interface GuestCheckoutResponseBody {
   order: Order
   email_sent: boolean
 }
+
+export interface ChatProduct {
+  slug: string
+  name: string
+  brand: string
+  category_name: string
+  price_cents: number
+  in_stock: boolean
+  min_age_months: number
+  max_age_months: number
+  image_url: string | null
+}

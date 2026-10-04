@@ -56,7 +56,7 @@ export default function ChatWidget() {
     setMessages((current) => [...current, { role: 'user', text }])
     setPending(true)
     try {
-      const reply = await sendChatMessage(text, sessionId.current)
+      const { reply } = await sendChatMessage(text, sessionId.current)
       setMessages((current) => [...current, { role: 'bot', text: reply }])
     } catch (caught) {
       setError(toApiError(caught).message)
