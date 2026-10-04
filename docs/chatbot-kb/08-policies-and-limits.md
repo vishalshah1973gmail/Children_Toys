@@ -37,7 +37,7 @@ Every toy lists its manufacturer age range and safety notes on its product page.
 
 ## What card details does ToyBox keep?
 
-Guest checkout checks the card details but this assistant does not handle card data. Never type a real card number, password or personal secret into the chat. Use the standard test card 4242 4242 4242 4242 in the checkout forms.
+When a guest checks out, ToyBox checks the card details and then keeps only the card brand, the last four digits and the expiry month and year with the payment record. It does not keep the full card number or the security code (CVV). The order also keeps the name, billing address and shipping address entered at checkout. The assistant itself does not handle card data. Never type a real card number, password or personal secret into the chat; use the standard test card 4242 4242 4242 4242 in the checkout forms. Never type a real card number, password or personal secret into the chat. Use the standard test card 4242 4242 4242 4242 in the checkout forms.
 
 ## What is the limit on how much I can order?
 

@@ -13,12 +13,12 @@ ToyBox is a demo store. Account checkout uses Stripe in test mode, so no real mo
 
 ## What kinds of toys does ToyBox sell?
 
-ToyBox has 24 toys in five categories:
-- Building & Construction (5 toys): blocks, bricks, magnetic tiles and marble runs.
-- Dolls & Plush (5 toys): soft companions, dolls and playsets.
-- Games & Puzzles (5 toys): board games, card games and jigsaws.
-- Outdoor & Active Play (5 toys): ride-ons, sports sets and backyard toys.
-- STEM & Learning (4 toys): science kits, coding robots and early-literacy toys.
+ToyBox sells toys in five categories. The exact number of toys in each category changes as the catalogue changes; the product list or the live catalogue page has the current numbers.
+- Building & Construction: blocks, bricks, magnetic tiles and marble runs.
+- Dolls & Plush: soft companions, dolls and playsets.
+- Games & Puzzles: board games, card games and jigsaws.
+- Outdoor & Active Play: ride-ons, sports sets and backyard toys.
+- STEM & Learning: science kits, coding robots and early-literacy toys.
 
 ## What is in the site menu at the top of every page?
 

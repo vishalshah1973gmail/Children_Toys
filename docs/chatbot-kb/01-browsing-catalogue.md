@@ -5,7 +5,7 @@ Source: /catalog and /product/:slug
 
 ## How do I see all the toys?
 
-Choose "Shop all" in the header menu or "Shop all toys" on the home page. The catalogue page lists all 24 toys, 12 per page over 2 pages, with Previous, 1, 2 and Next buttons at the bottom. A summary line such as "24 toys match your filters" shows how many toys fit the current filters.
+Choose "Shop all" in the header menu or "Shop all toys" on the home page. The catalogue page lists the toys in pages, with Previous, numbered page and Next buttons at the bottom. A summary line such as "N toys match your filters" shows how many toys fit the current filters. The number of toys and pages depends on the current catalogue, so check the live page for exact counts.
 
 ## How do I search for a toy by name?
 
@@ -41,11 +41,11 @@ Press the "Reset" button at the top of the Filters panel on the catalogue page.
 
 ## What does a toy card on the catalogue show?
 
-Each card shows the category, the age range, the name, a short description, the price, the stock count (for example "92 in stock") and an "Add to cart" button. Clicking the picture or the name opens the full product page.
+Each card shows the category, the age range, the name, a short description, the price, the stock count (for example "N in stock") and an "Add to cart" button. Clicking the picture or the name opens the full product page.
 
 ## What information is on a product page?
 
-A product page shows the brand, name, price, recommended age, availability (how many are in stock), a description, and safety notes. It also has a quantity box and an "Add to cart" button, and a breadcrumb link back to the catalogue and the toy's category. For example, the Stargazer Beginner Telescope by Northlight costs $94.99, is recommended for ages 8 to 16 years, and its safety note warns never to look at the sun through it.
+A product page shows the brand, name, price, recommended age, availability (how many are in stock), a description, and safety notes. It also has a quantity box and an "Add to cart" button, and a breadcrumb link back to the catalogue and the toy's category. For example, the Stargazer Beginner Telescope by Northlight has a safety note that warns never to look at the sun through it. Prices and ages change over time, so see the product list or the live product page for current values.
 
 ## Where do I find safety information for a toy?
 
