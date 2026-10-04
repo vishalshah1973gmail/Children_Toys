@@ -446,6 +446,7 @@ LYZR_AGENT_ID=...     # agent id from Lyzr Studio
 
 Leave them blank and `POST /api/chat` returns `503 chat_not_configured`; the
 rest of the store is unaffected. See §13 for the chatbot itself.
+
 ---
 
 ## 10. Docker
