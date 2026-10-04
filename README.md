@@ -73,24 +73,30 @@ ECommerce_Website/
 │   │   ├── schemas/
 │   │   │   ├── common.py        Page[T], ErrorDetail, Message
 │   │   │   ├── user.py  category.py  product.py  cart.py  order.py
+│   │   │   └── chat.py          chat request/response, 500-char cap
 │   │   ├── services/
 │   │   │   ├── pricing.py       shipping / tax / totals in integer cents
 │   │   │   ├── cart_service.py  cart reads and mutations
 │   │   │   ├── order_service.py order creation, payment confirmation
-│   │   │   └── stripe_service.py Checkout Session + signature verification
+│   │   │   ├── stripe_service.py Checkout Session + signature verification
+│   │   │   └── chat_service.py  Lyzr agent proxy + per-client rate limiter
 │   │   └── routers/
 │   │       ├── auth.py  categories.py  products.py  cart.py
-│   │       ├── orders.py  checkout.py  admin.py
+│   │       ├── orders.py  checkout.py  admin.py  chat.py
 │   ├── scripts/
 │   │   ├── catalog_data.py            5 categories + 24 toys
 │   │   ├── generate_synthetic_data.py 2026 customers/orders → CSV
+│   │   ├── export_kb_products.py      active products → chatbot knowledge-base markdown
 │   │   └── seed.py                    loads everything into the database
 │   ├── data/                    generated CSVs (products, customers, orders,
 │   │                            order_items, payments)
 │   ├── static/uploads/          product images on local disk
 │   └── tests/
 │       ├── conftest.py  test_auth.py  test_admin_access.py
-│       ├── test_cart.py  test_checkout.py
+│       ├── test_cart.py  test_checkout.py  test_chat.py
+├── docs/
+│   └── chatbot-kb/              chatbot knowledge pack (docs 00-08, products.md,
+│                                test-questions.md); _crawl/ is scratch, not ingested
 └── frontend/
     ├── Dockerfile  nginx.conf  index.html  package.json
     ├── vite.config.ts  tsconfig.json  tailwind.config.js  postcss.config.js
@@ -98,13 +104,13 @@ ECommerce_Website/
     └── src/
         ├── main.tsx  App.tsx  index.css  types.ts  vite-env.d.ts
         ├── lib/format.ts
-        ├── api/    client.ts  auth.ts  catalog.ts  cart.ts  orders.ts  admin.ts
+        ├── api/    client.ts  auth.ts  catalog.ts  cart.ts  orders.ts  admin.ts  chat.ts
         ├── store/  authStore.ts  cartStore.ts
         ├── components/
         │   Layout.tsx  Navbar.tsx  Footer.tsx  ProductCard.tsx
         │   CatalogFilters.tsx  Pagination.tsx  Spinner.tsx
         │   ErrorBanner.tsx  EmptyState.tsx  ProtectedRoute.tsx
-        │   AdminRoute.tsx  AdminLayout.tsx
+        │   AdminRoute.tsx  AdminLayout.tsx  ChatWidget.tsx
         └── pages/
             HomePage  CatalogPage  ProductDetailPage  CartPage
             CheckoutPage  CheckoutSuccessPage  CheckoutCancelPage
@@ -253,6 +259,7 @@ Base path `/api`. Auth is a `Bearer <access_token>` header.
 | POST | `/checkout/session` | user | Create the pending order + Stripe session |
 | POST | `/checkout/dev-confirm/{order_number}` | user | Local confirm when Stripe is unconfigured |
 | POST | `/webhooks/stripe` | Stripe signature | Confirm payment, decrement stock |
+| POST | `/chat` | — | Shopper chatbot: `{message, session_id}` → `{reply}`; 429 `rate_limited`, 503 `chat_not_configured` / `chat_unavailable` |
 | GET | `/orders` | user | Own order history, paginated |
 | GET | `/orders/{order_number}` | user | Own order (admins may read any) |
 | GET | `/admin/stats` | admin | Dashboard headline numbers |
@@ -426,6 +433,19 @@ you have any keys.
 A webhook with a missing or invalid signature is rejected with `400`; with no
 `STRIPE_WEBHOOK_SECRET` configured at all it returns `503`.
 
+### Chatbot keys
+
+The shopper chat widget needs two more variables in `backend/.env` (they are
+listed in `backend/.env.example`, and in `render.yaml` as `sync: false`
+secrets):
+
+```
+LYZR_API_KEY=...      # Lyzr API key, server-side only
+LYZR_AGENT_ID=...     # agent id from Lyzr Studio
+```
+
+Leave them blank and `POST /api/chat` returns `503 chat_not_configured`; the
+rest of the store is unaffected. See §13 for the chatbot itself.
 ---
 
 ## 10. Docker
@@ -501,3 +521,44 @@ python -m scripts.seed --reset          # then reload
 * **Guest carts.** Not signed in, the cart lives in `localStorage` and its
   totals are a preview only. On sign-in `POST /api/cart/merge` folds it into
   the server cart, skipping anything that no longer fits available stock.
+
+---
+
+## 13. Chatbot
+
+A floating chat widget (`ChatWidget.tsx`, mounted in `Layout.tsx` and hidden on
+`/admin` pages) lets shoppers ask questions about the store. It calls the public
+`POST /api/chat` endpoint, which forwards the message to a Lyzr agent through
+`services/chat_service.py`. The Lyzr key stays on the server and is never sent to
+the browser. Messages are limited to 500 characters, and each client is limited
+to 20 requests per minute by an in-memory limiter. The browser keeps an anonymous
+session id in `localStorage` under `toybox.chat_session`.
+
+**Knowledge pack.** What the agent knows lives in `docs/chatbot-kb/`: nine
+hand-written docs (`00`-`08`), a generated `products.md`, and `test-questions.md`,
+a golden list of questions for checking the agent's answers. To refresh the
+product data, run this from `backend/` and then re-upload the files to Lyzr,
+chunking by heading:
+
+```bash
+python -m scripts.export_kb_products --base-url https://your-public-site
+```
+
+The committed `products.md` uses `localhost` links, so pass the public site URL
+when exporting for a deployed store. `docs/chatbot-kb/_crawl/` is raw crawl
+scratch and is not ingested.
+
+**Status.** The Lyzr request and response shape in `chat_service.py` (lines
+tagged `# LYZR SHAPE`) has not yet been confirmed against a live Lyzr account.
+
+**Before deploying.**
+
+* The rate limiter keys on the client IP. Behind Render's proxy, uvicorn does not
+  trust `X-Forwarded-For` by default, so all visitors would share one key and a
+  single global cap of 20 messages a minute. Set `FORWARDED_ALLOW_IPS=*` in the
+  Render environment (or add `--forwarded-allow-ips='*'` to the Dockerfile
+  `CMD`) first.
+* The login page prints the seeded demo logins. That is fine locally, but remove
+  it before any public deployment, and never put those credentials in the
+  knowledge base.
+* The whole site, including chat, assumes `localStorage` is available.
