@@ -13,7 +13,7 @@ Bring the cart subtotal (the price of the toys before shipping and tax) to $50.0
 
 ## How much sales tax is charged?
 
-Tax is 6.63% (the New Jersey rate) of the subtotal, rounded to the nearest cent with half a cent rounding up. Shipping is not taxed.
+Tax is 6.63% of the subtotal, rounded to the nearest cent with half a cent rounding up. Shipping is not taxed.
 
 ## How is my order total calculated?
 
