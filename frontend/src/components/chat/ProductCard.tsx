@@ -23,7 +23,7 @@ export default function ProductCard({ product }: { product: ChatProduct }) {
           <p className="text-sm font-extrabold text-brand-700">
             {formatMoney(product.price_cents)}
             <span
-              className={`ml-2 text-xs font-semibold ${product.in_stock ? 'text-emerald-700' : 'text-red-700'}`}
+              className={`ml-2 whitespace-nowrap text-xs font-semibold ${product.in_stock ? 'text-emerald-700' : 'text-red-700'}`}
             >
               {product.in_stock ? 'In stock' : 'Out of stock'}
             </span>
