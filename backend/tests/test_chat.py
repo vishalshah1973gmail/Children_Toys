@@ -22,7 +22,7 @@ def test_returns_agent_reply(client, monkeypatch):
     monkeypatch.setattr(chat_service, "ask_agent", fake)
     response = client.post("/api/chat", json=VALID)
     assert response.status_code == 200
-    assert response.json() == {"reply": "Shipping is $5.99."}
+    assert response.json() == {"reply": "Shipping is $5.99.", "products": []}
 
 
 @pytest.mark.parametrize("message", ["", "   ", "x" * 501])
@@ -130,3 +130,58 @@ def test_service_failures_raise_chat_unavailable_and_are_logged(monkeypatch, cap
         with pytest.raises(chat_service.ChatUnavailable):
             asyncio.run(chat_service.ask_agent("hello", "abcd1234"))
     assert any(record.levelno == logging.ERROR for record in caplog.records)
+
+
+def test_reply_includes_product_cards(client, db, product_factory, monkeypatch):
+    product = product_factory(slug="red-ball", price_cents=1999, stock=5)
+    product.name = "Rocket Race Family Board Game"
+    db.commit()
+
+    async def fake(message, session_id):
+        return "Try the Rocket Race Family Board Game, it is great."
+
+    monkeypatch.setattr(chat_service, "ask_agent", fake)
+    body = client.post("/api/chat", json=VALID).json()
+    assert body["reply"].startswith("Try the Rocket Race")
+    assert body["products"] == [
+        {
+            "slug": "red-ball",
+            "name": "Rocket Race Family Board Game",
+            "brand": "Fixture Co",
+            "category_name": "Test Blocks",
+            "price_cents": 1999,
+            "in_stock": True,
+            "min_age_months": 36,
+            "max_age_months": 96,
+            "image_url": "/static/uploads/red-ball.svg",
+        }
+    ]
+
+
+def test_out_of_stock_card_is_flagged(client, db, product_factory, monkeypatch):
+    product = product_factory(slug="sold-out", stock=0)
+    product.name = "Sold Out Robot Kit"
+    db.commit()
+
+    async def fake(message, session_id):
+        return "The Sold Out Robot Kit is popular."
+
+    monkeypatch.setattr(chat_service, "ask_agent", fake)
+    products = client.post("/api/chat", json=VALID).json()["products"]
+    assert [item["in_stock"] for item in products] == [False]
+
+
+def test_lookup_failure_still_returns_the_reply(client, monkeypatch, caplog):
+    async def fake(message, session_id):
+        return "Shipping is $5.99."
+
+    def explode(db, reply):
+        raise RuntimeError("database went away")
+
+    monkeypatch.setattr(chat_service, "ask_agent", fake)
+    monkeypatch.setattr("app.services.chat_products.find_mentioned_products", explode)
+    with caplog.at_level("ERROR", logger="app.routers.chat"):
+        response = client.post("/api/chat", json=VALID)
+    assert response.status_code == 200
+    assert response.json() == {"reply": "Shipping is $5.99.", "products": []}
+    assert any(record.levelname == "ERROR" for record in caplog.records)
