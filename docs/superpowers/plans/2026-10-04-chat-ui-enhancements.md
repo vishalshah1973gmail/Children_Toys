@@ -1252,7 +1252,7 @@ export default function MessageActions({ id, text }: { id: string; text: string 
 }
 ```
 
-- [ ] **Step 8: Verify.** From `frontend/`: `npm run typecheck`, `npm run build` (exit 0) and `node --test tests/` (all pass).
+- [ ] **Step 8: Verify.** From `frontend/`: `npm run typecheck`, `npm run build` (exit 0) and `node --test` (all pass).
 
 - [ ] **Step 9: Commit**
 
@@ -1636,7 +1636,7 @@ export default function ChatWidget() {
 }
 ```
 
-- [ ] **Step 2: Verify.** From `frontend/`: `npm run typecheck`, `npm run build` (both exit 0), `node --test tests/` (all pass).
+- [ ] **Step 2: Verify.** From `frontend/`: `npm run typecheck`, `npm run build` (both exit 0), `node --test` (all pass).
 
 - [ ] **Step 3: Commit**
 
@@ -1658,9 +1658,9 @@ git commit -m "feat: redesign chat widget with avatar, chips, cards and reply to
 - Consumes: the final behaviour of Tasks 1–6 (verify each fact in code before writing it).
 - Produces: updated docs.
 
-- [ ] **Step 1:** In `CLAUDE.md`'s `### Chatbot` subsection add (compact, same style): the `POST /api/chat` response is now `{reply, products}`; `services/chat_products.py` matches product names in the reply (full name or name without a trailing parenthetical, case/curly-quote insensitive, names under 6 characters ignored, longest match wins, at most 3, active products only, ordered by first appearance); a lookup failure is logged and returns `products: []`; the widget is split into `ChatWidget.tsx` plus `components/chat/` (message renderer, product card, chips, message actions, pure `chatText.ts` and `chatSuggestions.ts`); Nunito loads from Google Fonts for the chat only; pure frontend logic is tested with `node --test tests/` from `frontend/` (Node 24, no packages); thumbs are stored in the browser only (`toybox.chat_feedback`); chips are deterministic, from `chatSuggestions.ts`.
-- [ ] **Step 2:** In `README.md` update section 13 ("Chatbot") the same way, update the `POST /chat` row in the API table to mention `products`, add the new files to the file tree, and add `node --test tests/` to the section on running tests.
-- [ ] **Step 3:** Run `python -m pytest -q` (backend), `npm run typecheck` and `node --test tests/` (frontend). Expected: all green.
+- [ ] **Step 1:** In `CLAUDE.md`'s `### Chatbot` subsection add (compact, same style): the `POST /api/chat` response is now `{reply, products}`; `services/chat_products.py` matches product names in the reply (full name or name without a trailing parenthetical, case/curly-quote insensitive, names under 6 characters ignored, longest match wins, at most 3, active products only, ordered by first appearance); a lookup failure is logged and returns `products: []`; the widget is split into `ChatWidget.tsx` plus `components/chat/` (message renderer, product card, chips, message actions, pure `chatText.ts` and `chatSuggestions.ts`); Nunito loads from Google Fonts for the chat only; pure frontend logic is tested with `node --test` from `frontend/` (Node 24, no packages); thumbs are stored in the browser only (`toybox.chat_feedback`); chips are deterministic, from `chatSuggestions.ts`.
+- [ ] **Step 2:** In `README.md` update section 13 ("Chatbot") the same way, update the `POST /chat` row in the API table to mention `products`, add the new files to the file tree, and add `node --test` (run from `frontend/`) to the section on running tests.
+- [ ] **Step 3:** Run `python -m pytest -q` (backend), `npm run typecheck` and `node --test` from `frontend/` (frontend). Expected: all green.
 - [ ] **Step 4: Commit**
 
 ```bash
