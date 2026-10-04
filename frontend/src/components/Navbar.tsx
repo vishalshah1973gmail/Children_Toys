@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { to: '/catalog', label: 'Shop all' },
   { to: '/catalog?category=stem-learning', label: 'STEM' },
   { to: '/catalog?category=outdoor-active-play', label: 'Outdoor' },
+  { to: '/feedback', label: 'Feedback' },
 ]
 
 /** Top navigation with cart count and the account menu. */
