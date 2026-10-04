@@ -11,7 +11,7 @@ Snapshot as of 2026-10-04. Prices and stock change over time; check the product 
 - Brand: Blockworks
 - Price: $64.99
 - Availability: In stock
-- Recommended age: 72-168 months
+- Recommended age: 6 yr – 14 yr
 - Page: http://localhost:5173/product/castle-quest-brick-set
 - Safety notes: Choking hazard: contains small parts. Not for children under 3 years. Adult supervision recommended.
 
@@ -23,7 +23,7 @@ Castle Quest Brick Set (480 pieces) — A drawbridge, four towers, a dragon and 
 - Brand: BrightBuild
 - Price: $47.99
 - Availability: In stock
-- Recommended age: 48-144 months
+- Recommended age: 4 yr – 12 yr
 - Page: http://localhost:5173/product/gravity-loop-marble-run-deluxe
 - Safety notes: Choking hazard: contains small parts. Not for children under 3 years. Adult supervision recommended. Marbles are a choking hazard for children under 5.
 
@@ -35,7 +35,7 @@ Gravity Loop Marble Run (Deluxe) — A 118-piece run with two loops, a funnel, a
 - Brand: Tinker Crew
 - Price: $34.99
 - Availability: In stock
-- Recommended age: 36-96 months
+- Recommended age: 3 yr – 8 yr
 - Page: http://localhost:5173/product/junior-engineer-nuts-bolts-workshop
 - Safety notes: Choking hazard: contains small parts. Not for children under 3 years. Adult supervision recommended.
 
@@ -47,7 +47,7 @@ Junior Engineer Nuts & Bolts Workshop — Chunky plastic nuts, bolts, plates and
 - Brand: BrightBuild
 - Price: $59.99
 - Availability: In stock
-- Recommended age: 36-120 months
+- Recommended age: 3 yr – 10 yr
 - Page: http://localhost:5173/product/magnatile-explorer-starter-pack
 - Safety notes: Choking hazard: contains small parts. Not for children under 3 years. Adult supervision recommended. Contains magnets; seek medical help if swallowed.
 
@@ -59,7 +59,7 @@ MagnaTile Explorer Starter Pack (72 pieces) — Translucent magnetic tiles in sq
 - Brand: Maple & Moss
 - Price: $42.99
 - Availability: In stock
-- Recommended age: 24-96 months
+- Recommended age: 2 yr – 8 yr
 - Page: http://localhost:5173/product/rainbow-rise-wooden-block-set
 - Safety notes: Choking hazard: contains small parts. Not for children under 3 years. Adult supervision recommended.
 
@@ -71,7 +71,7 @@ Rainbow Rise Wooden Block Set (100 pieces) — One hundred sanded beechwood bloc
 - Brand: Hollow Hill
 - Price: $29.99
 - Availability: In stock
-- Recommended age: 0-96 months
+- Recommended age: 0 mo – 8 yr
 - Page: http://localhost:5173/product/bramble-organic-cotton-bear
 - Safety notes: Tested to ASTM F963. No small parts. Surface-wash only. Inspect for wear before each use.
 
@@ -83,7 +83,7 @@ Bramble the Organic Cotton Bear — A 12-inch bear in GOTS-certified organic cot
 - Brand: Little Lane
 - Price: $44.99
 - Availability: In stock
-- Recommended age: 36-96 months
+- Recommended age: 3 yr – 8 yr
 - Page: http://localhost:5173/product/dreamlight-nursery-doll-cot
 - Safety notes: Choking hazard: contains small parts. Not for children under 3 years. Adult supervision recommended.
 
@@ -95,7 +95,7 @@ Dreamlight Nursery Doll & Cot — A 14-inch baby doll with a folding wooden cot,
 - Brand: Maple & Moss
 - Price: $54.99
 - Availability: In stock
-- Recommended age: 36-108 months
+- Recommended age: 3 yr – 9 yr
 - Page: http://localhost:5173/product/little-kitchen-play-cafe-set
 - Safety notes: Choking hazard: contains small parts. Not for children under 3 years. Adult supervision recommended.
 
@@ -107,7 +107,7 @@ Little Kitchen Play Café Set — A wooden café counter with a clicking espress
 - Brand: Hollow Hill
 - Price: $32.99
 - Availability: In stock
-- Recommended age: 18-96 months
+- Recommended age: 18 mo – 8 yr
 - Page: http://localhost:5173/product/meadow-friends-rag-doll-iris
 - Safety notes: Tested to ASTM F963. No small parts. Surface-wash only. Inspect for wear before each use.
 
@@ -119,7 +119,7 @@ Meadow Friends Rag Doll — Iris — A soft-bodied 15-inch doll with yarn hair t
 - Brand: Hollow Hill
 - Price: $21.99
 - Availability: In stock
-- Recommended age: 24-84 months
+- Recommended age: 2 yr – 7 yr
 - Page: http://localhost:5173/product/pocket-pals-mini-plush-set
 - Safety notes: Tested to ASTM F963. No small parts. Surface-wash only. Inspect for wear before each use.
 
@@ -131,7 +131,7 @@ Pocket Pals Mini Plush Set (6 animals) — Six four-inch animals — fox, otter,
 - Brand: Fox & Feather
 - Price: $18.99
 - Availability: In stock
-- Recommended age: 84-168 months
+- Recommended age: 7 yr – 14 yr
 - Page: http://localhost:5173/product/deep-sea-200-piece-jigsaw
 - Safety notes: Choking hazard: contains small parts. Not for children under 3 years. Adult supervision recommended.
 
@@ -143,7 +143,7 @@ Deep Sea 200-Piece Jigsaw — A 200-piece coral-reef scene with a species key on
 - Brand: Tabletop Junior
 - Price: $28.99
 - Availability: In stock
-- Recommended age: 60-168 months
+- Recommended age: 5 yr – 14 yr
 - Page: http://localhost:5173/product/rocket-race-family-board-game
 - Safety notes: Choking hazard: contains small parts. Not for children under 3 years. Adult supervision recommended.
 
@@ -155,7 +155,7 @@ Rocket Race Family Board Game — A press-your-luck race to Jupiter for two to f
 - Brand: Tabletop Junior
 - Price: $12.99
 - Availability: In stock
-- Recommended age: 48-168 months
+- Recommended age: 4 yr – 14 yr
 - Page: http://localhost:5173/product/story-cubes-adventure-dice
 - Safety notes: Choking hazard: contains small parts. Not for children under 3 years. Adult supervision recommended.
 
@@ -167,7 +167,7 @@ Story Cubes Adventure Dice — Nine picture dice, 54 images, no rules to speak o
 - Brand: Fox & Feather
 - Price: $15.99
 - Availability: In stock
-- Recommended age: 36-84 months
+- Recommended age: 3 yr – 7 yr
 - Page: http://localhost:5173/product/sunny-farm-floor-puzzle
 - Safety notes: Choking hazard: contains small parts. Not for children under 3 years. Adult supervision recommended.
 
@@ -179,7 +179,7 @@ Sunny Farm 48-Piece Floor Puzzle — A two-foot farmyard scene in 48 chunky piec
 - Brand: Fox & Feather
 - Price: $17.99
 - Availability: In stock
-- Recommended age: 36-96 months
+- Recommended age: 3 yr – 8 yr
 - Page: http://localhost:5173/product/woodland-match-memory-game
 - Safety notes: Choking hazard: contains small parts. Not for children under 3 years. Adult supervision recommended.
 
@@ -191,7 +191,7 @@ Woodland Match Memory Game — Forty-eight thick board tiles with 24 illustrated
 - Brand: Rove
 - Price: $24.99
 - Availability: In stock
-- Recommended age: 24-120 months
+- Recommended age: 2 yr – 10 yr
 - Page: http://localhost:5173/product/backyard-bounce-jumbo-play-ball-set
 - Safety notes: Adult supervision recommended. Inflate to the printed pressure only.
 
@@ -203,7 +203,7 @@ Backyard Bounce Jumbo Play Ball Set — Three textured playground balls in grade
 - Brand: Rove
 - Price: $37.99
 - Availability: In stock
-- Recommended age: 72-168 months
+- Recommended age: 6 yr – 14 yr
 - Page: http://localhost:5173/product/junior-archery-target-set
 - Safety notes: Never aim at people or animals. Eye-injury risk. Adult supervision required at all times.
 
@@ -215,7 +215,7 @@ Junior Archery Target Set (foam-tipped) — A 24-inch draw bow with five foam-ti
 - Brand: Sunbeam Play
 - Price: $14.99
 - Availability: In stock
-- Recommended age: 36-144 months
+- Recommended age: 3 yr – 12 yr
 - Page: http://localhost:5173/product/sidewalk-chalk-artist-kit
 - Safety notes: Choking hazard: contains small parts. Not for children under 3 years. Adult supervision recommended.
 
@@ -227,7 +227,7 @@ Sidewalk Chalk Artist Kit (48 sticks) — Forty-eight dustless chalk sticks in 1
 - Brand: Sunbeam Play
 - Price: $67.99
 - Availability: In stock
-- Recommended age: 18-72 months
+- Recommended age: 18 mo – 6 yr
 - Page: http://localhost:5173/product/splash-zone-water-table
 - Safety notes: Drowning hazard: never leave a child unattended near water, even shallow. Empty the table after every use.
 
@@ -239,7 +239,7 @@ Splash Zone Water Table — A two-tier water table with a spinning wheel, a ramp
 - Brand: Rove
 - Price: $89.99
 - Availability: In stock
-- Recommended age: 24-60 months
+- Recommended age: 2 yr – 5 yr
 - Page: http://localhost:5173/product/trailblazer-wooden-balance-bike
 - Safety notes: Wear a properly fitted helmet and protective gear. Use on flat, dry surfaces away from traffic. Adult supervision required.
 
@@ -251,7 +251,7 @@ Trailblazer Wooden Balance Bike — A birch-ply balance bike with air tyres, an 
 - Brand: Little Lane
 - Price: $22.99
 - Availability: In stock
-- Recommended age: 36-84 months
+- Recommended age: 3 yr – 7 yr
 - Page: http://localhost:5173/product/alphabet-adventure-magnetic-letters
 - Safety notes: Choking hazard: contains small parts. Not for children under 3 years. Adult supervision recommended. Contains magnets; seek medical help if swallowed.
 
@@ -263,7 +263,7 @@ Alphabet Adventure Magnetic Letters — Uppercase and lowercase magnetic letters
 - Brand: Tinker Crew
 - Price: $79.99
 - Availability: In stock
-- Recommended age: 48-120 months
+- Recommended age: 4 yr – 10 yr
 - Page: http://localhost:5173/product/codebot-screen-free-coding-robot
 - Safety notes: Contains button-cell batteries; keep the battery compartment screwed shut and away from children under 3. Swallowing a battery is a medical emergency.
 
@@ -275,7 +275,7 @@ CodeBot Screen-Free Coding Robot — A programmable robot driven by physical ins
 - Brand: Northlight
 - Price: $94.99
 - Availability: In stock
-- Recommended age: 96-192 months
+- Recommended age: 8 yr – 16 yr
 - Page: http://localhost:5173/product/stargazer-beginner-telescope
 - Safety notes: Never look at the sun through this telescope or its finder. Permanent blindness can result. Adult supervision required.
 
@@ -287,7 +287,7 @@ Stargazer Beginner Telescope — A 70mm refractor on an aluminium tripod with tw
 - Brand: Tinker Crew
 - Price: $32.99
 - Availability: In stock
-- Recommended age: 72-156 months
+- Recommended age: 6 yr – 13 yr
 - Page: http://localhost:5173/product/volcano-crystal-science-lab
 - Safety notes: Contains chemicals. Adult supervision required. Wear the supplied goggles. Keep away from children under 6.
 

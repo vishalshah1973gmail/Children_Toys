@@ -33,3 +33,24 @@ def test_empty_catalogue_still_valid(db):
     text = render_products_markdown([], "2026-10-04", "http://x")
     assert text.startswith("# ToyBox Product Catalogue")
     assert "No products are currently listed." in text
+
+
+import pytest
+
+from scripts.export_kb_products import _age_range
+
+
+@pytest.mark.parametrize(
+    "min_months,max_months,expected",
+    [
+        (0, 96, "0 mo – 8 yr"),
+        (18, 72, "18 mo – 6 yr"),
+        (36, 168, "3 yr – 14 yr"),
+        (24, 24, "2 yr – 2 yr"),
+    ],
+)
+def test_age_range_matches_storefront_format(product_factory, min_months, max_months, expected):
+    product = product_factory(slug="aged")
+    product.min_age_months = min_months
+    product.max_age_months = max_months
+    assert _age_range(product) == expected

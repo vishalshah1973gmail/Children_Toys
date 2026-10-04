@@ -22,8 +22,15 @@ def _price(cents: int) -> str:
     return f"${dollars}.{remainder:02d}"
 
 
+def _age(months: int) -> str:
+    # Mirrors formatAgeMonths in frontend/src/lib/format.ts so the bot quotes what the site shows.
+    if months < 24:
+        return f"{months} mo"
+    return f"{months // 12} yr"
+
+
 def _age_range(product: Product) -> str:
-    return f"{product.min_age_months}-{product.max_age_months} months"
+    return f"{_age(product.min_age_months)} – {_age(product.max_age_months)}"
 
 
 def render_products_markdown(products: list[Product], as_of: str, base_url: str) -> str:
