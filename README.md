@@ -567,9 +567,13 @@ and `products` is an empty list, so the shopper still gets the answer.
 `frontend/src/components/chat/`: `ChatMessageBody` renders a reply, `ProductCard`
 shows a product, `SuggestionChips` offers follow-up questions, and
 `MessageActions` has copy and thumbs up/down. `chatText.ts` and
-`chatSuggestions.ts` hold the pure logic. Replies show paragraphs, numbered and
-bullet lists, **bold** text and links, never raw HTML, and a link appears only
-for an http(s) URL or one of the site's own routes. Suggestion chips are
+`chatSuggestions.ts` hold the pure logic. Replies show paragraphs, numbered
+lists, bullet lists (`-`, `*`, `+`, `•`), `#` headings (shown as bold lines),
+**bold** text, `inline code`, `---` rules (dropped), `[label](target)` links, and
+bare URLs or site paths. A link appears only for an http(s) URL or one of the
+site's own routes: an outside link shows its host next to the label, same-site
+addresses show as the page path, anything else stays plain text, and nothing is
+inserted as HTML. Suggestion chips are
 deterministic: a starter list plus a topic table in `chatSuggestions.ts`, and the
 knowledge base answers every suggested question. Thumbs are saved in this browser
 only, under `toybox.chat_feedback`, and are never sent to the server. The "New
@@ -605,6 +609,12 @@ If the answer is not in the knowledge base, say you don't know and suggest the F
 You cannot look up orders, change accounts, or process refunds. Prices and stock come from a snapshot and may have changed; say so when quoting them.
 Keep replies short, friendly and plain text.
 ```
+
+Lyzr's upload accepts only PDF, DOCX and TXT, so `docs/chatbot-kb/upload/` holds
+`.txt` copies of the `docs/chatbot-kb/*.md` files for uploading. After editing a
+`.md` doc, copy it over its `.txt` twin (PowerShell:
+`Copy-Item docs\chatbot-kb\05-shipping-tax-pricing.md docs\chatbot-kb\upload\05-shipping-tax-pricing.txt`);
+`products.txt` is `products.md` copied the same way.
 
 **Feedback page dependency.** The knowledge pack (docs 00, 06, 07, 08) and the
 agent prompt send shoppers to the Feedback page when the bot cannot help. The
