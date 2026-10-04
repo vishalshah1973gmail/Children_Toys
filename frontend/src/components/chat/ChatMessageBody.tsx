@@ -16,6 +16,13 @@ function InlineParts({ parts }: { parts: Inline[] }) {
             </strong>
           )
         }
+        if (part.kind === 'code') {
+          return (
+            <code key={index} className="rounded bg-orange-100 px-1 py-0.5 text-[13px] text-ink-900">
+              {part.text}
+            </code>
+          )
+        }
         if (part.kind === 'link') {
           return part.internal ? (
             <Link key={index} to={part.href} className={LINK_CLASS}>
@@ -39,6 +46,13 @@ export default function ChatMessageBody({ text }: { text: string }) {
   return (
     <div className="space-y-2 [overflow-wrap:anywhere]">
       {blocks.map((block, index) => {
+        if (block.kind === 'heading') {
+          return (
+            <p key={index} className="font-extrabold text-ink-900">
+              <InlineParts parts={block.content} />
+            </p>
+          )
+        }
         if (block.kind === 'ordered') {
           return (
             <ol key={index} className="list-decimal space-y-1 pl-5">
