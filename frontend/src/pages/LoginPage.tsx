@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import { toApiError } from '../api/client'
 import ErrorBanner from '../components/ErrorBanner'
+import SplitPage from '../components/SplitPage'
 import { useAuthStore } from '../store/authStore'
 import { useCartStore } from '../store/cartStore'
 
@@ -34,20 +35,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="mx-auto my-auto w-full max-w-md">
-      <h1 className="font-display text-3xl text-ink-900">Welcome back</h1>
-      <p className="mt-1 text-sm text-ink-700">Sign in to see your cart and order history.</p>
-
-      <form onSubmit={handleSubmit} className="card mt-6 space-y-4 p-6">
+    <SplitPage
+      eyebrow="Sign in"
+      title="Welcome back"
+      subtitle="Sign in to see your cart and order history."
+    >
+      <form onSubmit={handleSubmit} className="space-y-6">
         <ErrorBanner message={error} onDismiss={() => setError(null)} />
 
         <div>
-          <label className="label" htmlFor="username">
+          <label className="label text-base" htmlFor="username">
             Username
           </label>
           <input
             id="username"
-            className="input"
+            className="input py-3 text-base"
             autoComplete="username"
             required
             value={username}
@@ -56,13 +58,13 @@ export default function LoginPage() {
         </div>
 
         <div>
-          <label className="label" htmlFor="password">
+          <label className="label text-base" htmlFor="password">
             Password
           </label>
           <input
             id="password"
             type="password"
-            className="input"
+            className="input py-3 text-base"
             autoComplete="current-password"
             required
             value={password}
@@ -70,11 +72,11 @@ export default function LoginPage() {
           />
         </div>
 
-        <button type="submit" className="btn-primary w-full" disabled={loading}>
+        <button type="submit" className="btn-primary w-full py-3 text-lg" disabled={loading}>
           {loading ? 'Signing in…' : 'Sign in'}
         </button>
 
-        <p className="text-center text-sm text-ink-700">
+        <p className="text-center text-base text-ink-700">
           No account yet?{' '}
           <Link to="/register" className="font-semibold text-brand-700 hover:underline">
             Create one
@@ -82,10 +84,10 @@ export default function LoginPage() {
         </p>
       </form>
 
-      <div className="mt-4 rounded-lg border border-dashed border-ink-800/20 p-4 text-xs text-ink-700">
+      <div className="mt-6 rounded-lg border border-dashed border-ink-800/20 p-4 text-sm text-ink-700">
         <p className="font-semibold">Seeded demo logins</p>
         <p>admin / Admin123! — customer / Customer123!</p>
       </div>
-    </div>
+    </SplitPage>
   )
 }

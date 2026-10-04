@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { toApiError } from '../api/client'
 import ErrorBanner from '../components/ErrorBanner'
+import SplitPage from '../components/SplitPage'
 import { useAuthStore } from '../store/authStore'
 import { useCartStore } from '../store/cartStore'
 
@@ -38,20 +39,21 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="mx-auto my-auto w-full max-w-md">
-      <h1 className="font-display text-3xl text-ink-900">Create your account</h1>
-      <p className="mt-1 text-sm text-ink-700">One account for your cart, orders and receipts.</p>
-
-      <form onSubmit={handleSubmit} className="card mt-6 space-y-4 p-6">
+    <SplitPage
+      eyebrow="Join ToyBox"
+      title="Create your account"
+      subtitle="One account for your cart, orders and receipts."
+    >
+      <form onSubmit={handleSubmit} className="space-y-5">
         <ErrorBanner message={error} onDismiss={() => setError(null)} />
 
         <div>
-          <label className="label" htmlFor="reg-username">
+          <label className="label text-base" htmlFor="reg-username">
             Username
           </label>
           <input
             id="reg-username"
-            className="input"
+            className="input py-3 text-base"
             required
             minLength={3}
             pattern="[A-Za-z0-9_.\-]+"
@@ -62,13 +64,13 @@ export default function RegisterPage() {
         </div>
 
         <div>
-          <label className="label" htmlFor="reg-email">
+          <label className="label text-base" htmlFor="reg-email">
             Email
           </label>
           <input
             id="reg-email"
             type="email"
-            className="input"
+            className="input py-3 text-base"
             required
             value={form.email}
             onChange={(event) => update('email', event.target.value)}
@@ -76,47 +78,47 @@ export default function RegisterPage() {
         </div>
 
         <div>
-          <label className="label" htmlFor="reg-name">
+          <label className="label text-base" htmlFor="reg-name">
             Full name <span className="text-ink-700/60">(optional)</span>
           </label>
           <input
             id="reg-name"
-            className="input"
+            className="input py-3 text-base"
             value={form.full_name}
             onChange={(event) => update('full_name', event.target.value)}
           />
         </div>
 
         <div>
-          <label className="label" htmlFor="reg-password">
+          <label className="label text-base" htmlFor="reg-password">
             Password
           </label>
           <input
             id="reg-password"
             type="password"
-            className="input"
+            className="input py-3 text-base"
             required
             minLength={8}
             autoComplete="new-password"
             value={form.password}
             onChange={(event) => update('password', event.target.value)}
           />
-          <p className="mt-1 text-xs text-ink-700">
+          <p className="mt-1 text-sm text-ink-700">
             At least 8 characters, including one letter and one digit.
           </p>
         </div>
 
-        <button type="submit" className="btn-primary w-full" disabled={loading}>
+        <button type="submit" className="btn-primary w-full py-3 text-lg" disabled={loading}>
           {loading ? 'Creating account…' : 'Create account'}
         </button>
 
-        <p className="text-center text-sm text-ink-700">
+        <p className="text-center text-base text-ink-700">
           Already registered?{' '}
           <Link to="/login" className="font-semibold text-brand-700 hover:underline">
             Sign in
           </Link>
         </p>
       </form>
-    </div>
+    </SplitPage>
   )
 }
