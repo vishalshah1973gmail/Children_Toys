@@ -40,7 +40,7 @@ const BUTTON =
 /** Copy and thumbs up/down for one bot reply. Votes live in this browser only. */
 export default function MessageActions({ id, text }: { id: string; text: string }) {
   const [copied, setCopied] = useState(false)
-  const [vote, setVote] = useState<Vote | null>(null)
+  const [vote, setVote] = useState<Vote | null>(() => readVotes()[id] ?? null)
 
   useEffect(() => {
     if (!copied) return

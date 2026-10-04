@@ -53,6 +53,19 @@ function loadSessionId(): string {
   return startNewSession()
 }
 
+const FONT_LINK_ID = 'toybox-chat-font'
+const FONT_URL = 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap'
+
+// The font is chat-only, so it is fetched on first open instead of on every page load.
+function ensureChatFont() {
+  if (document.getElementById(FONT_LINK_ID)) return
+  const link = document.createElement('link')
+  link.id = FONT_LINK_ID
+  link.rel = 'stylesheet'
+  link.href = FONT_URL
+  document.head.appendChild(link)
+}
+
 function formatTime(time: number): string {
   return new Date(time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 }
@@ -106,7 +119,9 @@ export default function ChatWidget() {
   }, [messages, pending, open])
 
   useEffect(() => {
-    if (open) inputRef.current?.focus()
+    if (!open) return
+    ensureChatFont()
+    inputRef.current?.focus()
   }, [open])
 
   // Hooks above must all run before this early return.
@@ -118,6 +133,8 @@ export default function ChatWidget() {
   async function sendText(raw: string) {
     const text = raw.trim()
     if (!text || inFlight.current) return
+    // Chips and the Send button unmount or disable below; keep keyboard focus in the panel.
+    inputRef.current?.focus()
     // Generated once, lazily, so it is not recomputed on every render.
     if (sessionId.current === null) sessionId.current = loadSessionId()
     const generation = chatGeneration.current
@@ -227,7 +244,7 @@ export default function ChatWidget() {
                     <p className="max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-br-md bg-brand-600 px-3.5 py-2.5 text-white [overflow-wrap:anywhere]">
                       {message.text}
                     </p>
-                    <span className="mt-1 text-[11px] text-ink-700/70">{formatTime(message.time)}</span>
+                    <span className="mt-1 text-[11px] text-ink-700">{formatTime(message.time)}</span>
                   </div>
                 )
               }
@@ -251,7 +268,7 @@ export default function ChatWidget() {
                       </div>
                     )}
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-ink-700/70">{formatTime(message.time)}</span>
+                      <span className="text-[11px] text-ink-700">{formatTime(message.time)}</span>
                       {message.id !== 'greeting' && <MessageActions id={message.id} text={message.text} />}
                     </div>
                     {isLast && !pending && !hasUserMessage && (
