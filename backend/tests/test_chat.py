@@ -171,6 +171,21 @@ def test_out_of_stock_card_is_flagged(client, db, product_factory, monkeypatch):
     assert [item["in_stock"] for item in products] == [False]
 
 
+def test_card_without_an_image_has_null_image_url(client, db, product_factory, monkeypatch):
+    product = product_factory(slug="plain-toy", stock=3)
+    product.name = "Plain Wooden Toy Cart"
+    product.images.clear()
+    db.commit()
+
+    async def fake(message, session_id):
+        return "The Plain Wooden Toy Cart is simple and sturdy."
+
+    monkeypatch.setattr(chat_service, "ask_agent", fake)
+    products = client.post("/api/chat", json=VALID).json()["products"]
+    assert [item["image_url"] for item in products] == [None]
+    assert products[0]["slug"] == "plain-toy"
+
+
 def test_lookup_failure_still_returns_the_reply(client, monkeypatch, caplog):
     async def fake(message, session_id):
         return "Shipping is $5.99."
