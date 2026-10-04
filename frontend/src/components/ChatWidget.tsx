@@ -3,16 +3,43 @@ import { useLocation } from 'react-router-dom'
 
 import { sendChatMessage } from '../api/chat'
 import { toApiError } from '../api/client'
+import type { ChatProduct } from '../types'
+import ChatMessageBody from './chat/ChatMessageBody'
+import MessageActions from './chat/MessageActions'
+import ProductCard from './chat/ProductCard'
+import SuggestionChips from './chat/SuggestionChips'
+import { STARTER_QUESTIONS, followUpQuestions } from './chat/chatSuggestions'
 
-type ChatMessage = { role: 'user' | 'bot'; text: string }
+type ChatMessage = {
+  id: string
+  role: 'user' | 'bot'
+  text: string
+  time: number
+  products?: ChatProduct[]
+  suggestions?: string[]
+}
 
 const SESSION_KEY = 'toybox.chat_session'
 const MAX_CHARS = 500
 const GREETING = "Hi! I'm the ToyBox assistant. Ask me about products, checkout, shipping or tax."
 
+function greeting(): ChatMessage {
+  return { id: 'greeting', role: 'bot', text: GREETING, time: Date.now() }
+}
+
 // Both forms match the backend pattern ^[A-Za-z0-9_-]{8,64}$.
 function newSessionId(): string {
   return crypto.randomUUID?.() ?? `s${Date.now()}${Math.random().toString(36).slice(2)}`
+}
+
+function startNewSession(): string {
+  const created = newSessionId()
+  try {
+    localStorage.setItem(SESSION_KEY, created)
+  } catch {
+    // Storage blocked: the id lives in memory for this page only.
+  }
+  return created
 }
 
 /** Falls back to an in-memory id when localStorage is blocked. */
@@ -20,98 +47,277 @@ function loadSessionId(): string {
   try {
     const existing = localStorage.getItem(SESSION_KEY)
     if (existing) return existing
-    const created = newSessionId()
-    localStorage.setItem(SESSION_KEY, created)
-    return created
   } catch {
     return newSessionId()
   }
+  return startNewSession()
+}
+
+function formatTime(time: number): string {
+  return new Date(time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+}
+
+function Avatar({ size }: { size: 'sm' | 'md' }) {
+  const box = size === 'md' ? 'h-10 w-10' : 'h-7 w-7'
+  const icon = size === 'md' ? 'h-6 w-6' : 'h-4 w-4'
+  return (
+    <span
+      aria-hidden="true"
+      className={`grid shrink-0 place-items-center rounded-full bg-white text-brand-600 shadow-sm ${box}`}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={icon}
+      >
+        <rect x="4" y="7" width="16" height="12" rx="3" />
+        <path d="M12 7V4" />
+        <circle cx="12" cy="3.5" r="1" />
+        <circle cx="9" cy="13" r="1" fill="currentColor" />
+        <circle cx="15" cy="13" r="1" fill="currentColor" />
+        <path d="M9.5 16.5c1.5 1 3.5 1 5 0" />
+      </svg>
+    </span>
+  )
 }
 
 export default function ChatWidget() {
   const location = useLocation()
   const [open, setOpen] = useState(false)
-  const [messages, setMessages] = useState<ChatMessage[]>([{ role: 'bot', text: GREETING }])
+  const [messages, setMessages] = useState<ChatMessage[]>(() => [greeting()])
   const [draft, setDraft] = useState('')
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const sessionId = useRef<string | null>(null)
+  const inFlight = useRef(false)
+  const chatGeneration = useRef(0)
+  const idCounter = useRef(0)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const launcherRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    bottomRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'end' })
   }, [messages, pending, open])
+
+  useEffect(() => {
+    if (open) inputRef.current?.focus()
+  }, [open])
 
   // Hooks above must all run before this early return.
   if (location.pathname.startsWith('/admin')) return null
 
-  async function handleSubmit(event: FormEvent) {
-    event.preventDefault()
-    const text = draft.trim()
-    if (!text || pending) return
+  // The time part keeps ids unique across page loads, so a stored vote can never attach to a new message.
+  const makeId = () => `${Date.now().toString(36)}-${idCounter.current++}`
+
+  async function sendText(raw: string) {
+    const text = raw.trim()
+    if (!text || inFlight.current) return
     // Generated once, lazily, so it is not recomputed on every render.
     if (sessionId.current === null) sessionId.current = loadSessionId()
+    const generation = chatGeneration.current
+    const asked = [...messages.filter((message) => message.role === 'user').map((m) => m.text), text]
+    inFlight.current = true
     setDraft('')
     setError(null)
-    setMessages((current) => [...current, { role: 'user', text }])
+    setMessages((current) => [...current, { id: makeId(), role: 'user', text, time: Date.now() }])
     setPending(true)
     try {
-      const { reply } = await sendChatMessage(text, sessionId.current)
-      setMessages((current) => [...current, { role: 'bot', text: reply }])
+      const { reply, products } = await sendChatMessage(text, sessionId.current)
+      // "New chat" was pressed while waiting: this reply belongs to the old conversation.
+      if (generation !== chatGeneration.current) return
+      setMessages((current) => [
+        ...current,
+        {
+          id: makeId(),
+          role: 'bot',
+          text: reply,
+          time: Date.now(),
+          products,
+          suggestions: followUpQuestions(text, reply, asked),
+        },
+      ])
     } catch (caught) {
-      setError(toApiError(caught).message)
+      if (generation === chatGeneration.current) setError(toApiError(caught).message)
     } finally {
-      setPending(false)
+      if (generation === chatGeneration.current) {
+        inFlight.current = false
+        setPending(false)
+      }
     }
   }
 
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault()
+    void sendText(draft)
+  }
+
+  function newChat() {
+    chatGeneration.current += 1
+    inFlight.current = false
+    sessionId.current = startNewSession()
+    setMessages([greeting()])
+    setDraft('')
+    setError(null)
+    setPending(false)
+    inputRef.current?.focus()
+  }
+
+  const hasUserMessage = messages.some((message) => message.role === 'user')
+  const lastMessage = messages[messages.length - 1]
+
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-3 font-chat">
       {open && (
         <section
           aria-label="ToyBox assistant"
-          className="card flex h-[28rem] w-80 max-w-[calc(100vw-2rem)] flex-col overflow-hidden shadow-xl"
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') {
+              setOpen(false)
+              launcherRef.current?.focus()
+            }
+          }}
+          className="chat-open flex h-[min(36rem,calc(100dvh-6rem))] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-ink-800/10 bg-[#fffaf5] shadow-2xl"
         >
-          <header className="bg-brand-600 px-4 py-3 text-sm font-semibold text-white">
-            ToyBox assistant
-          </header>
-          <div className="flex-1 space-y-2 overflow-y-auto p-3 text-sm" aria-live="polite">
-            {messages.map((message, index) => (
-              <p
-                key={index}
-                className={
-                  message.role === 'user'
-                    ? 'ml-8 whitespace-pre-wrap rounded-lg bg-brand-600 px-3 py-2 text-white'
-                    : 'mr-8 whitespace-pre-wrap rounded-lg bg-orange-50 px-3 py-2 text-ink-800'
-                }
-              >
-                {message.text}
+          <header className="flex items-center gap-3 bg-gradient-to-r from-brand-600 to-brand-700 px-4 py-3 text-white">
+            <Avatar size="md" />
+            <div className="min-w-0 flex-1">
+              <p className="text-base font-extrabold leading-tight">ToyBox assistant</p>
+              <p className="flex items-center gap-1.5 text-xs text-white/90">
+                <span aria-hidden="true" className="h-2 w-2 rounded-full bg-emerald-300" />
+                Here to help
               </p>
-            ))}
-            {pending && <p className="mr-8 rounded-lg bg-orange-50 px-3 py-2 text-ink-700">Typing…</p>}
+            </div>
+            <button
+              type="button"
+              onClick={newChat}
+              aria-label="Start a new chat"
+              title="Start a new chat"
+              className="grid h-9 w-9 place-items-center rounded-full hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                className="h-5 w-5"
+              >
+                <path d="M3 12a9 9 0 0 1 15.5-6.2L21 8" />
+                <path d="M21 3v5h-5" />
+                <path d="M21 12a9 9 0 0 1-15.5 6.2L3 16" />
+                <path d="M3 21v-5h5" />
+              </svg>
+            </button>
+          </header>
+
+          <div className="flex-1 space-y-4 overflow-y-auto px-3 py-4 text-[15px] leading-relaxed" aria-live="polite">
+            {messages.map((message, index) => {
+              const isLast = message === lastMessage
+              if (message.role === 'user') {
+                return (
+                  <div key={message.id} className="flex flex-col items-end">
+                    <p className="max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-br-md bg-brand-600 px-3.5 py-2.5 text-white [overflow-wrap:anywhere]">
+                      {message.text}
+                    </p>
+                    <span className="mt-1 text-[11px] text-ink-700/70">{formatTime(message.time)}</span>
+                  </div>
+                )
+              }
+              const showAvatar = messages[index + 1]?.role !== 'bot'
+              return (
+                <div key={message.id} className="flex items-end gap-2">
+                  {showAvatar ? <Avatar size="sm" /> : <span className="w-7 shrink-0" />}
+                  <div className="min-w-0 max-w-[85%] flex-1 space-y-2">
+                    <div className="rounded-2xl rounded-bl-md border border-ink-800/10 bg-white px-3.5 py-2.5 text-ink-800 shadow-sm">
+                      <ChatMessageBody text={message.text} />
+                    </div>
+                    {message.products && message.products.length > 0 && (
+                      <div className="space-y-2">
+                        {message.products.map((product) => (
+                          <ProductCard key={product.slug} product={product} />
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-ink-700/70">{formatTime(message.time)}</span>
+                      {message.id !== 'greeting' && <MessageActions id={message.id} text={message.text} />}
+                    </div>
+                    {isLast && !pending && !hasUserMessage && (
+                      <SuggestionChips questions={STARTER_QUESTIONS} onPick={(q) => void sendText(q)} />
+                    )}
+                    {isLast && !pending && message.suggestions && (
+                      <SuggestionChips questions={message.suggestions} onPick={(q) => void sendText(q)} />
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+
+            {pending && (
+              <div className="flex items-end gap-2">
+                <Avatar size="sm" />
+                <div
+                  role="status"
+                  aria-label="The assistant is typing"
+                  className="flex items-center gap-1.5 rounded-2xl rounded-bl-md border border-ink-800/10 bg-white px-4 py-3 shadow-sm"
+                >
+                  <span className="chat-dot inline-block h-2 w-2 rounded-full bg-ink-700/60" />
+                  <span className="chat-dot inline-block h-2 w-2 rounded-full bg-ink-700/60" />
+                  <span className="chat-dot inline-block h-2 w-2 rounded-full bg-ink-700/60" />
+                </div>
+              </div>
+            )}
             {error && (
-              <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-red-700">
+              <p role="alert" className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">
                 {error}
               </p>
             )}
             <div ref={bottomRef} />
           </div>
-          <form onSubmit={handleSubmit} className="flex gap-2 border-t border-ink-800/10 p-2">
+
+          <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-ink-800/10 bg-white p-3">
             <input
+              ref={inputRef}
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               maxLength={MAX_CHARS}
               placeholder="Ask a question…"
               aria-label="Your question"
-              className="input min-w-0 flex-1"
+              className="min-w-0 flex-1 rounded-full border border-ink-800/15 bg-orange-50/50 px-4 py-2.5 text-[15px] outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30"
             />
-            <button type="submit" disabled={pending || !draft.trim()} className="btn-primary">
-              Send
+            <button
+              type="submit"
+              disabled={pending || !draft.trim()}
+              aria-label="Send message"
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-600 text-white hover:bg-brand-700 disabled:opacity-40"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                className="h-5 w-5"
+              >
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
             </button>
           </form>
         </section>
       )}
       <button
+        ref={launcherRef}
         type="button"
         onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
