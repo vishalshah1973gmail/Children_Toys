@@ -73,13 +73,14 @@ ECommerce_Website/
 │   │   ├── schemas/
 │   │   │   ├── common.py        Page[T], ErrorDetail, Message
 │   │   │   ├── user.py  category.py  product.py  cart.py  order.py
-│   │   │   └── chat.py          chat request/response, 500-char cap
+│   │   │   └── chat.py          chat request/response, ChatProduct card, 500-char cap
 │   │   ├── services/
 │   │   │   ├── pricing.py       shipping / tax / totals in integer cents
 │   │   │   ├── cart_service.py  cart reads and mutations
 │   │   │   ├── order_service.py order creation, payment confirmation
 │   │   │   ├── stripe_service.py Checkout Session + signature verification
-│   │   │   └── chat_service.py  Lyzr agent proxy + per-client rate limiter
+│   │   │   ├── chat_service.py  Lyzr agent proxy + per-client rate limiter
+│   │   │   └── chat_products.py products named in a chat reply (for cards)
 │   │   └── routers/
 │   │       ├── auth.py  categories.py  products.py  cart.py
 │   │       ├── orders.py  checkout.py  admin.py  chat.py
@@ -93,7 +94,7 @@ ECommerce_Website/
 │   ├── static/uploads/          product images on local disk
 │   └── tests/
 │       ├── conftest.py  test_auth.py  test_admin_access.py
-│       ├── test_cart.py  test_checkout.py  test_chat.py
+│       ├── test_cart.py  test_checkout.py  test_chat.py  test_chat_products.py
 ├── docs/
 │   └── chatbot-kb/              chatbot knowledge pack (docs 00-08, products.md,
 │                                test-questions.md); _crawl/ is scratch, not ingested
@@ -111,6 +112,8 @@ ECommerce_Website/
         │   CatalogFilters.tsx  Pagination.tsx  Spinner.tsx
         │   ErrorBanner.tsx  EmptyState.tsx  ProtectedRoute.tsx
         │   AdminRoute.tsx  AdminLayout.tsx  ChatWidget.tsx
+        │   chat/  ChatMessageBody.tsx  ProductCard.tsx  SuggestionChips.tsx
+        │          MessageActions.tsx  chatText.ts  chatSuggestions.ts
         └── pages/
             HomePage  CatalogPage  ProductDetailPage  CartPage
             CheckoutPage  CheckoutSuccessPage  CheckoutCancelPage
@@ -259,7 +262,7 @@ Base path `/api`. Auth is a `Bearer <access_token>` header.
 | POST | `/checkout/session` | user | Create the pending order + Stripe session |
 | POST | `/checkout/dev-confirm/{order_number}` | user | Local confirm when Stripe is unconfigured |
 | POST | `/webhooks/stripe` | Stripe signature | Confirm payment, decrement stock |
-| POST | `/chat` | — | Shopper chatbot: `{message, session_id}` → `{reply}`; 429 `rate_limited`, 503 `chat_not_configured` / `chat_unavailable` |
+| POST | `/chat` | — | Shopper chatbot: `{message, session_id}` → `{reply, products}` (up to 3 live product cards); 429 `rate_limited`, 503 `chat_not_configured` / `chat_unavailable` |
 | GET | `/orders` | user | Own order history, paginated |
 | GET | `/orders/{order_number}` | user | Own order (admins may read any) |
 | GET | `/admin/stats` | admin | Dashboard headline numbers |
@@ -378,6 +381,18 @@ The 50 synthetic customers (e.g. `priya.shah`) all share the password
 cd backend
 pytest              # or: python -m pytest -v
 ```
+
+The chat widget's pure logic (reply parsing and suggestion chips) has its own
+tests, run with Node's built-in runner and no extra packages:
+
+```bash
+cd frontend
+node --test         # Node 24; `node --test tests/` does not work on Node 24
+```
+
+It runs `tests/chatText.test.mjs` and `tests/chatSuggestions.test.mjs`. On the
+backend, `test_chat.py` covers the endpoint and `test_chat_products.py` covers
+the product matching.
 
 Each test gets its own throwaway SQLite file, so tests never touch `app.db`.
 Coverage includes registration, login with the wrong password, an admin route
@@ -535,6 +550,33 @@ the browser. Messages are limited to 500 characters, and each client is limited
 to 20 requests per minute by an in-memory limiter. The browser keeps an anonymous
 session id in `localStorage` under `toybox.chat_session`.
 
+**Product cards.** After the Lyzr call, the endpoint looks for products named in
+the reply (`services/chat_products.py`) and returns up to three of them as
+`products` next to `reply`. Each card carries the slug, name, brand, category,
+price in cents, an in-stock flag, the age range and the image URL; the stock
+quantity is never sent. A product matches when its full name, or its name
+without a trailing parenthetical such as "(100 pieces)", appears in the reply,
+ignoring case and curly quotes. Names under 6 characters are ignored, the
+longest match claims its text first, only active products count, cards follow
+the order of first appearance, and out-of-stock products are included and
+flagged. The lookup runs in a worker thread; if it fails, the failure is logged
+and `products` is an empty list, so the shopper still gets the answer.
+
+**Widget.** `ChatWidget.tsx` holds the state and layout. The parts live in
+`frontend/src/components/chat/`: `ChatMessageBody` renders a reply, `ProductCard`
+shows a product, `SuggestionChips` offers follow-up questions, and
+`MessageActions` has copy and thumbs up/down. `chatText.ts` and
+`chatSuggestions.ts` hold the pure logic. Replies show paragraphs, numbered and
+bullet lists, **bold** text and links, never raw HTML, and a link appears only
+for an http(s) URL or one of the site's own routes. Suggestion chips are
+deterministic: a starter list plus a topic table in `chatSuggestions.ts`, and the
+knowledge base answers every suggested question. Thumbs are saved in this browser
+only, under `toybox.chat_feedback`, and are never sent to the server. The "New
+chat" button starts a new Lyzr session id. Escape closes the panel and focus
+moves to the input when it opens. The chat text uses the Nunito font, loaded from
+Google Fonts in `frontend/index.html` and applied only through the `font-chat`
+class.
+
 **Knowledge pack.** What the agent knows lives in `docs/chatbot-kb/`: nine
 hand-written docs (`00`-`08`), a generated `products.md`, and `test-questions.md`,
 a golden list of questions for checking the agent's answers. To refresh the
@@ -596,3 +638,8 @@ session.
   it before any public deployment, and never put those credentials in the
   knowledge base.
 * The whole site, including chat, assumes `localStorage` is available.
+* Product cards come from the live database, so their prices and stock are
+  current even when the answer text quotes the knowledge-base snapshot.
+* The chat font is a third-party request: the Google Fonts stylesheet link in
+  `frontend/index.html` is render-blocking if Google is slow or blocked, and
+  while it is blocked the chat falls back to the system font.
