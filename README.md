@@ -387,7 +387,7 @@ tests, run with Node's built-in runner and no extra packages:
 
 ```bash
 cd frontend
-node --test         # Node 24; `node --test tests/` does not work on Node 24
+node --test         # Node 24; give it no directory argument (naming the directory fails)
 ```
 
 It runs `tests/chatText.test.mjs` and `tests/chatSuggestions.test.mjs`. On the
@@ -556,7 +556,8 @@ the reply (`services/chat_products.py`) and returns up to three of them as
 price in cents, an in-stock flag, the age range and the image URL; the stock
 quantity is never sent. A product matches when its full name, or its name
 without a trailing parenthetical such as "(100 pieces)", appears in the reply,
-ignoring case and curly quotes. Names under 6 characters are ignored, the
+ignoring case and folding curly quotes and en/em dashes to plain ones. Only
+whole-word matches count, so a name inside a longer word does not match. Names under 6 characters are ignored, the
 longest match claims its text first, only active products count, cards follow
 the order of first appearance, and out-of-stock products are included and
 flagged. The lookup runs in a worker thread; if it fails, the failure is logged
