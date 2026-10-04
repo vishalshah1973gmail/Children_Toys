@@ -59,7 +59,7 @@ async def ask_agent(message: str, session_id: str) -> str:
         response.raise_for_status()
         reply = response.json().get("response")  # LYZR SHAPE
     except (httpx.HTTPError, ValueError, AttributeError) as error:
-        logger.error("Lyzr request failed: %s", error)
+        logger.error("Lyzr request failed: %s: %s", type(error).__name__, error)
         raise ChatUnavailable(str(error)) from error
     if not isinstance(reply, str) or not reply.strip():
         logger.error("Lyzr reply missing text: %r", reply)
