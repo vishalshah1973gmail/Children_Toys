@@ -69,8 +69,8 @@ export default function ProductDetailPage() {
   const soldOut = product.stock_quantity <= 0
 
   return (
-    <div>
-      <nav className="mb-5 text-sm text-ink-700">
+    <div className="mx-auto w-full max-w-[1400px]">
+      <nav className="mb-6 text-base text-ink-700">
         <Link to="/catalog" className="hover:text-brand-700">
           Catalog
         </Link>
@@ -80,13 +80,13 @@ export default function ProductDetailPage() {
         </Link>
       </nav>
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        <div>
+      <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
+        <div className="lg:sticky lg:top-24 lg:self-start">
           <div className="card overflow-hidden bg-orange-50">
             <img
               src={assetUrl(images[activeImage]?.url ?? product.primary_image_url)}
               alt={images[activeImage]?.alt_text ?? product.name}
-              className="h-[420px] w-full object-cover"
+              className="aspect-[4/3] w-full object-cover"
             />
           </div>
           {images.length > 1 && (
@@ -96,7 +96,7 @@ export default function ProductDetailPage() {
                   key={image.id}
                   type="button"
                   onClick={() => setActiveImage(index)}
-                  className={`h-20 w-20 overflow-hidden rounded-lg border-2 ${
+                  className={`h-24 w-24 overflow-hidden rounded-lg border-2 ${
                     index === activeImage ? 'border-brand-500' : 'border-transparent'
                   }`}
                 >
@@ -113,19 +113,21 @@ export default function ProductDetailPage() {
 
         <div>
           <p className="badge bg-orange-100 text-brand-800">{product.brand}</p>
-          <h1 className="mt-3 font-display text-3xl text-ink-900">{product.name}</h1>
-          <p className="mt-2 text-2xl font-semibold text-ink-900">
+          <h1 className="mt-3 font-display text-4xl leading-tight text-ink-900 xl:text-5xl">
+            {product.name}
+          </h1>
+          <p className="mt-3 text-3xl font-semibold text-ink-900">
             {formatMoney(product.price_cents)}
           </p>
 
-          <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-lg bg-white p-3">
+          <dl className="mt-6 grid grid-cols-2 gap-4 text-base">
+            <div className="rounded-xl bg-white p-4">
               <dt className="text-ink-700">Recommended age</dt>
               <dd className="font-semibold text-ink-900">
                 {formatAgeRange(product.min_age_months, product.max_age_months)}
               </dd>
             </div>
-            <div className="rounded-lg bg-white p-3">
+            <div className="rounded-xl bg-white p-4">
               <dt className="text-ink-700">Availability</dt>
               <dd className={`font-semibold ${soldOut ? 'text-red-600' : 'text-emerald-700'}`}>
                 {soldOut ? 'Sold out' : `${product.stock_quantity} in stock`}
@@ -133,10 +135,10 @@ export default function ProductDetailPage() {
             </div>
           </dl>
 
-          <p className="mt-5 leading-relaxed text-ink-700">{product.description}</p>
+          <p className="mt-6 text-lg leading-relaxed text-ink-700">{product.description}</p>
 
           {product.safety_notes && (
-            <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+            <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5 text-base text-amber-900">
               <p className="font-semibold">Safety notes</p>
               <p className="mt-1">{product.safety_notes}</p>
             </div>
@@ -144,8 +146,8 @@ export default function ProductDetailPage() {
 
           <ErrorBanner message={cartError} />
 
-          <div className="mt-6 flex items-center gap-3">
-            <label className="text-sm text-ink-700" htmlFor="quantity">
+          <div className="mt-8 flex items-center gap-3">
+            <label className="text-base text-ink-700" htmlFor="quantity">
               Qty
             </label>
             <input
@@ -160,7 +162,7 @@ export default function ProductDetailPage() {
             />
             <button
               type="button"
-              className="btn-primary flex-1"
+              className="btn-primary px-10 py-3 text-lg"
               disabled={soldOut}
               onClick={() => void handleAdd()}
             >

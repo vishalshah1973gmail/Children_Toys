@@ -32,7 +32,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-ink-800/10 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3">
+      <div className="flex items-center gap-6 px-4 py-3 sm:px-8 xl:px-12">
         <Link to="/" className="flex items-center gap-2">
           <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-600 font-display text-lg text-white">
             T

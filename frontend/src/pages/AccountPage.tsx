@@ -35,7 +35,7 @@ export default function AccountPage() {
   if (!user) return null
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto my-auto w-full max-w-2xl space-y-6">
       <h1 className="font-display text-2xl text-ink-900">Your account</h1>
 
       <dl className="card grid gap-3 p-6 text-sm sm:grid-cols-2">

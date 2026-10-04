@@ -38,7 +38,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md">
+    <div className="mx-auto my-auto w-full max-w-md">
       <h1 className="font-display text-3xl text-ink-900">Create your account</h1>
       <p className="mt-1 text-sm text-ink-700">One account for your cart, orders and receipts.</p>
 

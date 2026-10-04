@@ -6,7 +6,7 @@ export default function CheckoutCancelPage() {
   const orderNumber = searchParams.get('order_number')
 
   return (
-    <div className="mx-auto max-w-xl py-16 text-center">
+    <div className="mx-auto my-auto w-full max-w-xl py-16 text-center">
       <h1 className="font-display text-3xl text-ink-900">Payment cancelled</h1>
       <p className="mt-3 text-ink-700">
         Nothing has been charged and your cart is untouched.

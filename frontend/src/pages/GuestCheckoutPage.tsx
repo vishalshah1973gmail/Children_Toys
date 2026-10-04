@@ -89,7 +89,7 @@ export default function GuestCheckoutPage() {
   if (receipt) {
     const { order, email_sent } = receipt
     return (
-      <div className="mx-auto max-w-2xl py-8 text-center">
+      <div className="mx-auto my-auto w-full max-w-2xl py-8 text-center">
         <h1 className="font-display text-3xl text-ink-900">Order placed</h1>
         <p className="mt-2 text-ink-700">
           Order <span className="font-semibold">{order.order_number}</span> for{' '}

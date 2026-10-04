@@ -42,14 +42,14 @@ export default function HomePage() {
 
   return (
     <div className="space-y-14">
-      <section className="card overflow-hidden">
-        <div className="grid gap-6 p-8 sm:p-12 md:grid-cols-[1.2fr_1fr] md:items-center">
+      <section className="card flex overflow-hidden md:min-h-[calc(100svh-9rem)]">
+        <div className="grid w-full gap-8 p-8 sm:p-12 xl:p-16 md:grid-cols-[1fr_1.2fr] md:items-center">
           <div>
             <p className="badge bg-orange-100 text-brand-800">Ages 0–14</p>
-            <h1 className="mt-3 font-display text-4xl leading-tight text-ink-900 sm:text-5xl">
+            <h1 className="mt-3 font-display text-4xl leading-tight text-ink-900 sm:text-5xl xl:text-7xl">
               Toys worth keeping.
             </h1>
-            <p className="mt-4 max-w-lg text-ink-700">
+            <p className="mt-4 max-w-lg text-ink-700 xl:max-w-xl xl:text-lg">
               Every toy here lists its real age range, its brand and its safety notes — so you can
               buy for the child in front of you rather than the box art.
             </p>
@@ -62,7 +62,7 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3 xl:gap-5">
             {featured.slice(0, 6).map((product) => (
               <Link
                 key={product.id}
@@ -112,7 +112,7 @@ export default function HomePage() {
         {loading ? (
           <Spinner />
         ) : (
-          <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-4 min-[2600px]:grid-cols-8">
             {featured.map((product) => (
               <ProductCard key={product.id} product={product} onAdd={(item) => void addToCart(item)} />
             ))}

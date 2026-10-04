@@ -3,7 +3,7 @@ const FORM_URL = import.meta.env.VITE_N8N_FEEDBACK_FORM_URL as string | undefine
 /** Embeds the n8n-hosted feedback form. n8n owns the fields and the submit flow. */
 export default function FeedbackPage() {
   return (
-    <div className="mx-auto max-w-2xl py-8">
+    <div className="mx-auto my-auto w-full max-w-2xl py-8">
       <h1 className="font-display text-2xl text-ink-900">Feedback</h1>
       <p className="mt-2 text-ink-700">
         Tell us about your experience shopping with ToyBox.

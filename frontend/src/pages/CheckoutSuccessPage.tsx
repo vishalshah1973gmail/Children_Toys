@@ -59,7 +59,7 @@ export default function CheckoutSuccessPage() {
   if (waiting) return <Spinner label="Confirming your payment…" />
 
   return (
-    <div className="mx-auto max-w-2xl py-8 text-center">
+    <div className="mx-auto my-auto w-full max-w-2xl py-8 text-center">
       <ErrorBanner message={error} />
 
       {order && (

@@ -189,7 +189,7 @@ export default function ChatWidget() {
   const lastMessage = messages[messages.length - 1]
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-3 font-chat">
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-3 font-chat sm:bottom-6 sm:right-6">
       {open && (
         <section
           aria-label="ToyBox assistant"
@@ -337,6 +337,18 @@ export default function ChatWidget() {
           </form>
         </section>
       )}
+      <div className="flex items-center gap-3">
+      {!open && (
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-hidden="true"
+          onClick={() => setOpen(true)}
+          className="rounded-full bg-white px-4 py-2 text-sm font-bold text-ink-900 shadow-lg ring-1 ring-ink-800/10 hover:bg-orange-50"
+        >
+          Chat with us
+        </button>
+      )}
       <button
         ref={launcherRef}
         type="button"
@@ -344,8 +356,14 @@ export default function ChatWidget() {
         aria-expanded={open}
         aria-label={open ? 'Close chat' : 'Open chat'}
         title={open ? 'Close chat' : 'Chat with us'}
-        className="h-14 w-14 rounded-full bg-brand-600 hover:bg-brand-700 text-white shadow-lg grid place-items-center focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus:outline-none"
+        className="relative h-16 w-16 rounded-full bg-brand-600 hover:bg-brand-700 text-white shadow-lg grid place-items-center focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus:outline-none sm:h-[72px] sm:w-[72px]"
       >
+        {!open && (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 rounded-full ring-4 ring-brand-500/50 motion-safe:animate-ping"
+          />
+        )}
         {open ? (
           <svg
             viewBox="0 0 24 24"
@@ -375,6 +393,7 @@ export default function ChatWidget() {
           </svg>
         )}
       </button>
+      </div>
     </div>
   )
 }

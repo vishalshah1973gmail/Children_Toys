@@ -181,7 +181,7 @@ export default function CatalogPage() {
           />
         ) : (
           <>
-            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 min-[1900px]:grid-cols-5">
               {result?.items.map((product) => (
                 <ProductCard
                   key={product.id}
