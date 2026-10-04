@@ -574,9 +574,10 @@ deterministic: a starter list plus a topic table in `chatSuggestions.ts`, and th
 knowledge base answers every suggested question. Thumbs are saved in this browser
 only, under `toybox.chat_feedback`, and are never sent to the server. The "New
 chat" button starts a new Lyzr session id. Escape closes the panel and focus
-moves to the input when it opens. The chat text uses the Nunito font, loaded from
-Google Fonts in `frontend/index.html` and applied only through the `font-chat`
-class.
+moves to the input when it opens. The chat text uses the Nunito font, applied only
+through the `font-chat` class. Its Google Fonts stylesheet is requested from
+fonts.googleapis.com only the first time a visitor opens the chat (injected by
+`ChatWidget.tsx`); nothing is requested from Google on other page loads.
 
 **Knowledge pack.** What the agent knows lives in `docs/chatbot-kb/`: nine
 hand-written docs (`00`-`08`), a generated `products.md`, and `test-questions.md`,
@@ -641,6 +642,6 @@ session.
 * The whole site, including chat, assumes `localStorage` is available.
 * Product cards come from the live database, so their prices and stock are
   current even when the answer text quotes the knowledge-base snapshot.
-* The chat font is a third-party request: the Google Fonts stylesheet link in
-  `frontend/index.html` is render-blocking if Google is slow or blocked, and
-  while it is blocked the chat falls back to the system font.
+* The chat font is a third-party request, made only when a visitor first opens the
+  chat. If Google is blocked or slow, the chat shows in the system sans-serif and
+  still works.
