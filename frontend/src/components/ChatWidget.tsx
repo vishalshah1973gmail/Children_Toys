@@ -101,7 +101,7 @@ export default function ChatWidget() {
   const launcherRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
     bottomRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'end' })
   }, [messages, pending, open])
 
@@ -182,7 +182,7 @@ export default function ChatWidget() {
               launcherRef.current?.focus()
             }
           }}
-          className="chat-open flex h-[min(36rem,calc(100dvh-6rem))] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-ink-800/10 bg-[#fffaf5] shadow-2xl"
+          className="chat-open flex h-[min(36rem,calc(100dvh-6rem))] max-h-[calc(100vh-6rem)] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-ink-800/10 bg-[#fffaf5] shadow-2xl"
         >
           <header className="flex items-center gap-3 bg-gradient-to-r from-brand-600 to-brand-700 px-4 py-3 text-white">
             <Avatar size="md" />
@@ -233,12 +233,16 @@ export default function ChatWidget() {
               }
               const showAvatar = messages[index + 1]?.role !== 'bot'
               return (
-                <div key={message.id} className="flex items-end gap-2">
-                  {showAvatar ? <Avatar size="sm" /> : <span className="w-7 shrink-0" />}
-                  <div className="min-w-0 max-w-[85%] flex-1 space-y-2">
-                    <div className="rounded-2xl rounded-bl-md border border-ink-800/10 bg-white px-3.5 py-2.5 text-ink-800 shadow-sm">
-                      <ChatMessageBody text={message.text} />
+                <div key={message.id} className="space-y-2">
+                  <div className="flex items-end gap-2">
+                    {showAvatar ? <Avatar size="sm" /> : <span className="w-7 shrink-0" />}
+                    <div className="min-w-0 max-w-[85%] flex-1">
+                      <div className="rounded-2xl rounded-bl-md border border-ink-800/10 bg-white px-3.5 py-2.5 text-ink-800 shadow-sm">
+                        <ChatMessageBody text={message.text} />
+                      </div>
                     </div>
+                  </div>
+                  <div className="min-w-0 space-y-2 pl-9">
                     {message.products && message.products.length > 0 && (
                       <div className="space-y-2">
                         {message.products.map((product) => (

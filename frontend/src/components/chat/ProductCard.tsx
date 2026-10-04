@@ -15,7 +15,7 @@ export default function ProductCard({ product }: { product: ChatProduct }) {
         <div aria-hidden="true" className="h-16 w-16 shrink-0 rounded-lg bg-orange-100" />
       )}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-bold text-ink-900">{product.name}</p>
+        <p className="[display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden [overflow-wrap:anywhere] text-sm font-bold text-ink-900">{product.name}</p>
         <p className="truncate text-xs text-ink-700">
           {product.brand} · {formatAgeRange(product.min_age_months, product.max_age_months)}
         </p>
