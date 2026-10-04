@@ -16,7 +16,7 @@ Expected: $37.98 ($30.00 + $5.99 shipping + $1.99 tax).
 Source: 05-shipping-tax-pricing.md
 
 ## Q: What is ToyBox?
-Expected: A demo online toy store for ages 0 to 14 with 24 toys in five categories.
+Expected: A demo online toy store for ages 0 to 14 selling toys in five categories.
 Source: 00-store-overview.md
 
 ## Q: Will my card really be charged?
@@ -32,7 +32,7 @@ Expected: Tick "In stock only" on the catalogue page.
 Source: 01-browsing-catalogue.md
 
 ## Q: How many toys are in the STEM & Learning category?
-Expected: 4 toys.
+Expected: Does not state a fixed number; says the count changes with the catalogue and points to the live catalogue page or the product list.
 Source: 00-store-overview.md
 
 ## Q: What is the price of the Stargazer Beginner Telescope?

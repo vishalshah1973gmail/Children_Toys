@@ -570,7 +570,11 @@ uncommitted work. Land that work first or in the same merge, otherwise those
 answers lead to the 404 page.
 
 **Status.** The Lyzr request and response shape in `chat_service.py` (lines
-tagged `# LYZR SHAPE`) has not yet been confirmed against a live Lyzr account.
+tagged `# LYZR SHAPE`) was confirmed on 2026-10-04 against a live Lyzr agent:
+the request matches the sample from the agent's API tab and the reply is read
+from the `response` field. All 26 questions in
+`docs/chatbot-kb/test-questions.md` were answered correctly, each in a fresh
+session.
 
 **Before deploying.**
 

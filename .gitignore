@@ -39,3 +39,8 @@ scripts/logs/
 
 # Raw chatbot crawl notes: scratch data and demo logins, never commit or upload
 docs/chatbot-kb/_crawl/
+
+# Local scratch: browser-automation output, test screenshots, TypeScript build cache
+.playwright-mcp/
+/chat-*.png
+frontend/tsconfig.tsbuildinfo
