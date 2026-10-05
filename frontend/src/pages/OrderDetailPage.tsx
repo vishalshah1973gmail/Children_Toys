@@ -53,13 +53,13 @@ export default function OrderDetailPage() {
   }
 
   return (
-    <div>
-      <Link to="/orders" className="text-sm text-brand-700 hover:underline">
+    <div className="mx-auto w-full max-w-[1400px]">
+      <Link to="/orders" className="text-base text-brand-700 hover:underline">
         ← All orders
       </Link>
 
       <div className="mt-3 flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-2xl text-ink-900">{order.order_number}</h1>
+        <h1 className="font-display text-4xl text-ink-900">{order.order_number}</h1>
         <span className={`badge ${STATUS_STYLES[order.status]}`}>{order.status}</span>
       </div>
 
@@ -68,45 +68,45 @@ export default function OrderDetailPage() {
           const value = order[entry.key] as string | null
           return (
             <li key={entry.label} className={`card p-4 ${value ? '' : 'opacity-50'}`}>
-              <p className="text-xs uppercase tracking-wide text-ink-700">{entry.label}</p>
-              <p className="mt-1 text-sm font-medium text-ink-900">{formatDateTime(value)}</p>
+              <p className="text-sm uppercase tracking-wide text-ink-700">{entry.label}</p>
+              <p className="mt-1 text-base font-medium text-ink-900">{formatDateTime(value)}</p>
             </li>
           )
         })}
       </ol>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
-        <section className="card p-5">
-          <h2 className="font-display text-lg text-ink-900">Items</h2>
+      <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_380px]">
+        <section className="card p-6">
+          <h2 className="font-display text-2xl text-ink-900">Items</h2>
           <ul className="mt-3 divide-y divide-ink-800/10">
             {order.items.map((item) => (
               <li key={item.id} className="flex items-center gap-4 py-3">
                 <img
                   src={assetUrl(item.image_url)}
                   alt={item.product_name}
-                  className="h-16 w-16 rounded-lg object-cover"
+                  className="h-24 w-24 rounded-lg object-cover"
                 />
                 <div className="flex-1">
                   <Link
                     to={`/product/${item.product_slug}`}
-                    className="font-medium text-ink-900 hover:text-brand-700"
+                    className="text-lg font-medium text-ink-900 hover:text-brand-700"
                   >
                     {item.product_name}
                   </Link>
-                  <p className="text-sm text-ink-700">
+                  <p className="text-base text-ink-700">
                     {formatMoney(item.unit_price_cents)} × {item.quantity}
                   </p>
                 </div>
-                <p className="font-semibold">{formatMoney(item.line_total_cents)}</p>
+                <p className="text-lg font-semibold">{formatMoney(item.line_total_cents)}</p>
               </li>
             ))}
           </ul>
         </section>
 
         <aside className="space-y-4">
-          <div className="card p-5">
-            <h2 className="font-display text-lg text-ink-900">Totals</h2>
-            <dl className="mt-3 space-y-2 text-sm">
+          <div className="card p-6">
+            <h2 className="font-display text-2xl text-ink-900">Totals</h2>
+            <dl className="mt-3 space-y-3 text-base">
               <div className="flex justify-between">
                 <dt className="text-ink-700">Subtotal</dt>
                 <dd>{formatMoney(order.subtotal_cents)}</dd>
@@ -128,8 +128,8 @@ export default function OrderDetailPage() {
             </dl>
           </div>
 
-          <div className="card p-5 text-sm">
-            <h2 className="font-display text-lg text-ink-900">Shipping to</h2>
+          <div className="card p-6 text-base">
+            <h2 className="font-display text-2xl text-ink-900">Shipping to</h2>
             <p className="mt-2 text-ink-700">
               {order.shipping_name}
               <br />
@@ -144,8 +144,8 @@ export default function OrderDetailPage() {
           </div>
 
           {order.payments.length > 0 && (
-            <div className="card p-5 text-sm">
-              <h2 className="font-display text-lg text-ink-900">Payments</h2>
+            <div className="card p-6 text-base">
+              <h2 className="font-display text-2xl text-ink-900">Payments</h2>
               <ul className="mt-2 space-y-2">
                 {order.payments.map((payment) => (
                   <li key={payment.id} className="flex justify-between">

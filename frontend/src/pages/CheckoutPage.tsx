@@ -82,11 +82,11 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
+    <div className="mx-auto grid w-full max-w-[1400px] gap-8 lg:grid-cols-[1fr_380px]">
       <section>
-        <h1 className="font-display text-2xl text-ink-900">Checkout</h1>
+        <h1 className="font-display text-4xl text-ink-900">Checkout</h1>
 
-        <ol className="mt-4 flex items-center gap-2 text-sm">
+        <ol className="mt-5 flex items-center gap-2 text-base">
           {STEPS.map((entry, index) => {
             const active = entry.key === step
             const complete = STEPS.findIndex((item) => item.key === step) > index
@@ -124,17 +124,17 @@ export default function CheckoutPage() {
           </div>
         )}
 
-        <form onSubmit={placeOrder} className="card mt-5 space-y-4 p-6">
+        <form onSubmit={placeOrder} className="card mt-6 space-y-5 p-8">
           {step === 'contact' && (
             <>
               <div>
-                <label className="label" htmlFor="checkout-email">
+                <label className="label text-base" htmlFor="checkout-email">
                   Email for the receipt
                 </label>
                 <input
                   id="checkout-email"
                   type="email"
-                  className="input"
+                  className="input py-3 text-base"
                   required
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
@@ -142,7 +142,7 @@ export default function CheckoutPage() {
               </div>
               <button
                 type="button"
-                className="btn-primary"
+                className="btn-primary px-8 py-3 text-base"
                 disabled={!email}
                 onClick={() => setStep('shipping')}
               >
@@ -155,83 +155,83 @@ export default function CheckoutPage() {
             <>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
-                  <label className="label" htmlFor="ship-name">
+                  <label className="label text-base" htmlFor="ship-name">
                     Full name
                   </label>
                   <input
                     id="ship-name"
-                    className="input"
+                    className="input py-3 text-base"
                     required
                     value={address.full_name}
                     onChange={(event) => update('full_name', event.target.value)}
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="label" htmlFor="ship-line1">
+                  <label className="label text-base" htmlFor="ship-line1">
                     Address
                   </label>
                   <input
                     id="ship-line1"
-                    className="input"
+                    className="input py-3 text-base"
                     required
                     value={address.line1}
                     onChange={(event) => update('line1', event.target.value)}
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="label" htmlFor="ship-line2">
+                  <label className="label text-base" htmlFor="ship-line2">
                     Apartment, suite <span className="text-ink-700/60">(optional)</span>
                   </label>
                   <input
                     id="ship-line2"
-                    className="input"
+                    className="input py-3 text-base"
                     value={address.line2}
                     onChange={(event) => update('line2', event.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="label" htmlFor="ship-city">
+                  <label className="label text-base" htmlFor="ship-city">
                     City
                   </label>
                   <input
                     id="ship-city"
-                    className="input"
+                    className="input py-3 text-base"
                     required
                     value={address.city}
                     onChange={(event) => update('city', event.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="label" htmlFor="ship-state">
+                  <label className="label text-base" htmlFor="ship-state">
                     State
                   </label>
                   <input
                     id="ship-state"
-                    className="input"
+                    className="input py-3 text-base"
                     required
                     value={address.state}
                     onChange={(event) => update('state', event.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="label" htmlFor="ship-zip">
+                  <label className="label text-base" htmlFor="ship-zip">
                     ZIP / postal code
                   </label>
                   <input
                     id="ship-zip"
-                    className="input"
+                    className="input py-3 text-base"
                     required
                     value={address.postal_code}
                     onChange={(event) => update('postal_code', event.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="label" htmlFor="ship-country">
+                  <label className="label text-base" htmlFor="ship-country">
                     Country
                   </label>
                   <input
                     id="ship-country"
-                    className="input uppercase"
+                    className="input py-3 text-base uppercase"
                     maxLength={2}
                     required
                     value={address.country}
@@ -241,12 +241,12 @@ export default function CheckoutPage() {
               </div>
 
               <div className="flex gap-3">
-                <button type="button" className="btn-secondary" onClick={() => setStep('contact')}>
+                <button type="button" className="btn-secondary px-8 py-3 text-base" onClick={() => setStep('contact')}>
                   Back
                 </button>
                 <button
                   type="button"
-                  className="btn-primary"
+                  className="btn-primary px-8 py-3 text-base"
                   disabled={
                     !address.full_name ||
                     !address.line1 ||
@@ -264,7 +264,7 @@ export default function CheckoutPage() {
 
           {step === 'review' && (
             <>
-              <div className="rounded-lg bg-orange-50 p-4 text-sm">
+              <div className="rounded-lg bg-orange-50 p-5 text-base">
                 <p className="font-semibold text-ink-900">Shipping to</p>
                 <p className="mt-1 text-ink-700">
                   {address.full_name}
@@ -283,12 +283,12 @@ export default function CheckoutPage() {
                     <img
                       src={assetUrl(line.image_url)}
                       alt={line.name}
-                      className="h-12 w-12 rounded object-cover"
+                      className="h-16 w-16 rounded object-cover"
                     />
-                    <span className="flex-1 text-sm">
+                    <span className="flex-1 text-lg">
                       {line.name} × {line.quantity}
                     </span>
-                    <span className="text-sm font-medium">
+                    <span className="text-lg font-medium">
                       {formatMoney(line.line_total_cents)}
                     </span>
                   </li>
@@ -296,15 +296,15 @@ export default function CheckoutPage() {
               </ul>
 
               <div className="flex gap-3">
-                <button type="button" className="btn-secondary" onClick={() => setStep('shipping')}>
+                <button type="button" className="btn-secondary px-8 py-3 text-base" onClick={() => setStep('shipping')}>
                   Back
                 </button>
-                <button type="submit" className="btn-primary flex-1" disabled={submitting || blocked}>
+                <button type="submit" className="btn-primary flex-1 py-3 text-lg" disabled={submitting || blocked}>
                   {submitting ? 'Redirecting to payment…' : `Pay ${formatMoney(cart.total_cents)}`}
                 </button>
               </div>
 
-              <p className="text-xs text-ink-700">
+              <p className="text-sm text-ink-700">
                 Payment is taken by Stripe in test mode. Card 4242 4242 4242 4242, any future expiry
                 and any CVC.
               </p>
@@ -314,8 +314,8 @@ export default function CheckoutPage() {
       </section>
 
       <aside className="card h-fit p-6">
-        <h2 className="font-display text-xl text-ink-900">Summary</h2>
-        <dl className="mt-4 space-y-2 text-sm">
+        <h2 className="font-display text-2xl text-ink-900">Summary</h2>
+        <dl className="mt-4 space-y-3 text-base">
           <div className="flex justify-between">
             <dt className="text-ink-700">Subtotal</dt>
             <dd>{formatMoney(cart.subtotal_cents)}</dd>
@@ -328,7 +328,7 @@ export default function CheckoutPage() {
             <dt className="text-ink-700">Tax</dt>
             <dd>{formatMoney(cart.tax_cents)}</dd>
           </div>
-          <div className="flex justify-between border-t border-ink-800/10 pt-3 text-base font-bold">
+          <div className="flex justify-between border-t border-ink-800/10 pt-3 text-xl font-bold">
             <dt>Total</dt>
             <dd>{formatMoney(cart.total_cents)}</dd>
           </div>

@@ -39,8 +39,8 @@ export default function OrdersPage() {
   if (loading && !result) return <Spinner label="Loading your orders…" />
 
   return (
-    <div>
-      <h1 className="font-display text-2xl text-ink-900">Your orders</h1>
+    <div className="mx-auto w-full max-w-[1100px]">
+      <h1 className="font-display text-4xl text-ink-900">Your orders</h1>
       <ErrorBanner message={error} />
 
       {result && result.items.length === 0 ? (
@@ -55,30 +55,30 @@ export default function OrdersPage() {
         />
       ) : (
         <>
-          <ul className="mt-4 space-y-3">
+          <ul className="mt-6 space-y-4">
             {result?.items.map((order) => (
-              <li key={order.id} className="card flex flex-wrap items-center gap-4 p-4">
+              <li key={order.id} className="card flex flex-wrap items-center gap-5 p-6">
                 <div className="min-w-40">
                   <Link
                     to={`/orders/${order.order_number}`}
-                    className="font-semibold text-ink-900 hover:text-brand-700"
+                    className="text-xl font-semibold text-ink-900 hover:text-brand-700"
                   >
                     {order.order_number}
                   </Link>
-                  <p className="text-sm text-ink-700">{formatDate(order.placed_at)}</p>
+                  <p className="text-base text-ink-700">{formatDate(order.placed_at)}</p>
                 </div>
 
                 <span className={`badge ${STATUS_STYLES[order.status]}`}>{order.status}</span>
 
-                <p className="text-sm text-ink-700">
+                <p className="text-base text-ink-700">
                   {order.items.reduce((sum, item) => sum + item.quantity, 0)} item(s)
                 </p>
 
-                <p className="ml-auto font-semibold text-ink-900">
+                <p className="ml-auto text-xl font-semibold text-ink-900">
                   {formatMoney(order.total_cents)}
                 </p>
 
-                <Link to={`/orders/${order.order_number}`} className="btn-secondary">
+                <Link to={`/orders/${order.order_number}`} className="btn-secondary px-6 py-2.5 text-base">
                   Details
                 </Link>
               </li>

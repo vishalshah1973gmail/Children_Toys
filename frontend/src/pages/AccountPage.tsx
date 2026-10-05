@@ -35,10 +35,10 @@ export default function AccountPage() {
   if (!user) return null
 
   return (
-    <div className="mx-auto my-auto w-full max-w-2xl space-y-6">
-      <h1 className="font-display text-2xl text-ink-900">Your account</h1>
+    <div className="mx-auto my-auto w-full max-w-3xl space-y-8">
+      <h1 className="font-display text-4xl text-ink-900">Your account</h1>
 
-      <dl className="card grid gap-3 p-6 text-sm sm:grid-cols-2">
+      <dl className="card grid gap-5 p-8 text-lg sm:grid-cols-2">
         <div>
           <dt className="text-ink-700">Username</dt>
           <dd className="font-medium text-ink-900">{user.username}</dd>
@@ -61,21 +61,21 @@ export default function AccountPage() {
         </div>
       </dl>
 
-      <form onSubmit={handleSubmit} className="card space-y-4 p-6">
-        <h2 className="font-display text-lg text-ink-900">Change password</h2>
+      <form onSubmit={handleSubmit} className="card space-y-5 p-8">
+        <h2 className="font-display text-2xl text-ink-900">Change password</h2>
         <ErrorBanner message={error} onDismiss={() => setError(null)} />
         {message && (
           <p className="rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-800">{message}</p>
         )}
 
         <div>
-          <label className="label" htmlFor="current-password">
+          <label className="label text-base" htmlFor="current-password">
             Current password
           </label>
           <input
             id="current-password"
             type="password"
-            className="input"
+            className="input py-3 text-base"
             required
             autoComplete="current-password"
             value={currentPassword}
@@ -84,13 +84,13 @@ export default function AccountPage() {
         </div>
 
         <div>
-          <label className="label" htmlFor="new-password">
+          <label className="label text-base" htmlFor="new-password">
             New password
           </label>
           <input
             id="new-password"
             type="password"
-            className="input"
+            className="input py-3 text-base"
             required
             minLength={8}
             autoComplete="new-password"
@@ -99,7 +99,7 @@ export default function AccountPage() {
           />
         </div>
 
-        <button type="submit" className="btn-primary" disabled={saving}>
+        <button type="submit" className="btn-primary px-8 py-3 text-base" disabled={saving}>
           {saving ? 'Updating…' : 'Update password'}
         </button>
       </form>

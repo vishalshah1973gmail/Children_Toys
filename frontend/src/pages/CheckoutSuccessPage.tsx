@@ -59,18 +59,18 @@ export default function CheckoutSuccessPage() {
   if (waiting) return <Spinner label="Confirming your payment…" />
 
   return (
-    <div className="mx-auto my-auto w-full max-w-2xl py-8 text-center">
+    <div className="mx-auto my-auto w-full max-w-3xl py-8 text-center">
       <ErrorBanner message={error} />
 
       {order && (
         <>
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-100 text-3xl">
+          <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-emerald-100 text-5xl">
             🎉
           </div>
-          <h1 className="mt-4 font-display text-3xl text-ink-900">
+          <h1 className="mt-5 font-display text-5xl text-ink-900">
             {order.status === 'pending' ? 'Order placed' : 'Payment confirmed'}
           </h1>
-          <p className="mt-2 text-ink-700">
+          <p className="mt-3 text-xl text-ink-700">
             Order <span className="font-semibold">{order.order_number}</span> for{' '}
             {formatMoney(order.total_cents)}.
           </p>
@@ -81,9 +81,9 @@ export default function CheckoutSuccessPage() {
             </p>
           )}
 
-          <ul className="card mt-6 divide-y divide-ink-800/10 p-4 text-left">
+          <ul className="card mt-8 divide-y divide-ink-800/10 p-6 text-left">
             {order.items.map((item) => (
-              <li key={item.id} className="flex justify-between py-2 text-sm">
+              <li key={item.id} className="flex justify-between py-3 text-lg">
                 <span>
                   {item.product_name} × {item.quantity}
                 </span>
@@ -92,11 +92,11 @@ export default function CheckoutSuccessPage() {
             ))}
           </ul>
 
-          <div className="mt-6 flex justify-center gap-3">
-            <Link to={`/orders/${order.order_number}`} className="btn-secondary">
+          <div className="mt-8 flex justify-center gap-4">
+            <Link to={`/orders/${order.order_number}`} className="btn-secondary px-8 py-3 text-lg">
               View order
             </Link>
-            <Link to="/catalog" className="btn-primary">
+            <Link to="/catalog" className="btn-primary px-8 py-3 text-lg">
               Keep shopping
             </Link>
           </div>
