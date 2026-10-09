@@ -2,11 +2,13 @@
 
 import os
 import secrets
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import List
 
 from fastapi import APIRouter, Depends, File, Query, UploadFile, status
-from sqlalchemy import func, select
+from pydantic import BaseModel
+from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session, selectinload
 
 from app.core.config import settings
@@ -17,7 +19,7 @@ from app.db.session import get_db
 from app.models.category import Category
 from app.models.order import Order, OrderStatus
 from app.models.product import Product, ProductImage
-from app.models.user import User
+from app.models.user import ApprovalStatus, User
 from app.schemas.category import CategoryCreate, CategoryRead, CategoryUpdate
 from app.schemas.common import Message, Page
 from app.schemas.order import OrderRead, OrderStatusUpdate
@@ -28,8 +30,8 @@ from app.schemas.product import (
     StockAdjustment,
     UploadedImage,
 )
-from app.schemas.user import UserRead
-from app.services import order_service
+from app.schemas.user import RegistrationRead, RejectRequest, UserRead
+from app.services import order_service, registration_service
 
 router = APIRouter(
     prefix="/admin", tags=["admin"], dependencies=[Depends(get_current_admin)]
@@ -390,6 +392,86 @@ def admin_list_users(
     )
 
 
+# --------------------------------------------------------------------------
+# Registration approvals
+# --------------------------------------------------------------------------
+class RegistrationDecision(BaseModel):
+    """Outcome of an approve/reject click."""
+
+    user: RegistrationRead
+    email_sent: bool
+
+
+@router.get("/registrations", response_model=Page[RegistrationRead])
+def list_registrations(
+    db: Session = Depends(get_db),
+    status_filter: ApprovalStatus = Query(default=ApprovalStatus.PENDING, alias="status"),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
+) -> Page[RegistrationRead]:
+    """Registrations in one review state, oldest first."""
+    base = select(User).where(User.approval_status == status_filter)
+    total = db.execute(select(func.count()).select_from(base.subquery())).scalar_one()
+    rows = (
+        db.execute(
+            base.order_by(User.created_at, User.id).offset((page - 1) * page_size).limit(page_size)
+        )
+        .scalars()
+        .all()
+    )
+    pages = (total + page_size - 1) // page_size if total else 0
+    return Page[RegistrationRead](
+        items=[RegistrationRead.model_validate(user) for user in rows],
+        total=total,
+        page=page,
+        page_size=page_size,
+        pages=pages,
+    )
+
+
+def _decide(db: Session, user_id: int, new_status: ApprovalStatus, reason: str | None) -> User:
+    """Move a pending registration to a final state; 409 if it was already reviewed."""
+    if db.get(User, user_id) is None:
+        raise not_found("Registration")
+    # Single conditional UPDATE: two admins clicking at once cannot both win.
+    result = db.execute(
+        update(User)
+        .where(User.id == user_id, User.approval_status == ApprovalStatus.PENDING)
+        .values(
+            approval_status=new_status,
+            rejection_reason=reason,
+            reviewed_at=datetime.now(timezone.utc),
+        )
+    )
+    if result.rowcount != 1:
+        db.rollback()
+        raise api_error(
+            status.HTTP_409_CONFLICT,
+            "already_reviewed",
+            "This registration has already been reviewed",
+        )
+    db.commit()
+    user = db.get(User, user_id)
+    db.refresh(user)
+    return user
+
+
+@router.post("/registrations/{user_id}/approve", response_model=RegistrationDecision)
+def approve_registration(user_id: int, db: Session = Depends(get_db)) -> RegistrationDecision:
+    user = _decide(db, user_id, ApprovalStatus.APPROVED, None)
+    email_sent = registration_service.notify_approved(user)
+    return RegistrationDecision(user=RegistrationRead.model_validate(user), email_sent=email_sent)
+
+
+@router.post("/registrations/{user_id}/reject", response_model=RegistrationDecision)
+def reject_registration(
+    user_id: int, payload: RejectRequest, db: Session = Depends(get_db)
+) -> RegistrationDecision:
+    user = _decide(db, user_id, ApprovalStatus.REJECTED, payload.reason)
+    email_sent = registration_service.notify_rejected(user)
+    return RegistrationDecision(user=RegistrationRead.model_validate(user), email_sent=email_sent)
+
+
 @router.get("/stats", response_model=dict)
 def admin_stats(db: Session = Depends(get_db)) -> dict:
     """Headline numbers for the dashboard."""
@@ -413,4 +495,7 @@ def admin_stats(db: Session = Depends(get_db)) -> dict:
             select(func.count(Order.id)).where(Order.status == OrderStatus.PENDING)
         ).scalar_one(),
         "revenue_cents": revenue,
+        "pending_approvals": db.execute(
+            select(func.count(User.id)).where(User.approval_status == ApprovalStatus.PENDING)
+        ).scalar_one(),
     }
