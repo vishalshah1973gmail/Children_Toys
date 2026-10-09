@@ -32,6 +32,10 @@ The footer has shortcuts to All toys, Best value (all toys sorted by lowest pric
 
 No. Anyone can browse, fill a cart and check out as a guest without an account. An account adds order history, a saved cart, and the Stripe-based checkout.
 
+## Who can use the ToyBox assistant?
+
+The chat assistant is only available to registered shoppers who are signed in with an approved account. Visitors who are not signed in see a message that the assistant cannot respond until they register and log in. This keeps the assistant and the application limited to validated people.
+
 ## What can the ToyBox assistant help with?
 
 The assistant answers questions about browsing and finding toys, the cart, guest and account checkout, shipping, tax and totals, receipts and order history, creating an account and signing in, and the Feedback page. It cannot look up orders, change accounts or handle refunds; the Feedback page is the place for those requests.

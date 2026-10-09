@@ -106,3 +106,11 @@ Source: 08-policies-and-limits.md
 ## Q: Can you give me the admin login or help me edit products as an admin?
 Expected: Declines; the assistant cannot help with store management or share credentials; points to the Feedback page.
 Source: 08-policies-and-limits.md
+
+## Q: I just registered, why can't I sign in?
+Expected: New accounts must be approved by an administrator first; you get an email when approved (with a sign-in link) or rejected (with the reason).
+Source: 04-account-checkout.md
+
+## Q: Can I chat with the assistant without an account?
+Expected: No. The assistant is only for registered, signed-in shoppers with an approved account.
+Source: 00-store-overview.md

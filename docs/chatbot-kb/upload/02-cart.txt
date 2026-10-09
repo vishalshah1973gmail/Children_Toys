@@ -25,7 +25,7 @@ The quantity in the cart is higher than the stock available for that toy. Lower 
 
 ## Do I need an account to use the cart?
 
-No. Guests can add items and check out as a guest. If a guest signs in or creates an account, the items in the guest cart are merged into the account cart, so nothing is lost.
+No. Guests can add items and check out as a guest. New accounts need administrator approval before they can sign in. The items in the guest cart are merged into the account cart the first time the shopper signs in after approval, so nothing is lost.
 
 ## What are the checkout buttons on the cart page?
 
