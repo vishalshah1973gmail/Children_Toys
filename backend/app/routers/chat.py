@@ -1,4 +1,4 @@
-"""Shopper chatbot endpoint. Public; no account required."""
+"""Shopper chatbot endpoint. Requires a signed-in, approved user."""
 
 import logging
 
@@ -7,8 +7,10 @@ from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
+from app.core.deps import get_current_user
 from app.core.errors import api_error
 from app.db.session import get_db
+from app.models.user import User
 from app.schemas.chat import ChatProduct, ChatRequest, ChatResponse
 from app.services import chat_products, chat_service
 
@@ -26,7 +28,10 @@ def _cards_for(db: Session, reply: str) -> list[ChatProduct]:
 
 @router.post("", response_model=ChatResponse)
 async def chat(
-    payload: ChatRequest, request: Request, db: Session = Depends(get_db)
+    payload: ChatRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+    _user: User = Depends(get_current_user),
 ) -> ChatResponse:
     if not settings.lyzr_api_key or not settings.lyzr_agent_id:
         raise api_error(503, "chat_not_configured", "The chat assistant is not set up yet.")

@@ -15,6 +15,31 @@ def _configured(monkeypatch):
     chat_service.rate_limiter.reset()
 
 
+from tests.conftest import auth_headers  # noqa: E402
+
+
+@pytest.fixture(autouse=True)
+def _signed_in(client, customer_user):
+    """Chat needs a signed-in user; individual tests drop the header to test the gate."""
+    client.headers.update(auth_headers(client, "shopper", "Customer123!"))
+
+
+def test_chat_requires_login(client, monkeypatch):
+    async def boom(message, session_id):
+        raise AssertionError("Lyzr must not be called")
+
+    monkeypatch.setattr(chat_service, "ask_agent", boom)
+    client.headers.pop("Authorization")
+    response = client.post("/api/chat", json=VALID)
+    assert response.status_code == 401
+    assert response.json()["error"]["code"] == "not_authenticated"
+
+
+def test_chat_rejects_a_garbage_token(client):
+    client.headers["Authorization"] = "Bearer not-a-token"
+    assert client.post("/api/chat", json=VALID).status_code == 401
+
+
 def test_returns_agent_reply(client, monkeypatch):
     async def fake(message, session_id):
         return "Shipping is $5.99."
