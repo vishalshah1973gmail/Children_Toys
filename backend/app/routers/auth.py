@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 import jwt
 from fastapi import APIRouter, Depends, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -53,7 +53,8 @@ def register(payload: UserCreate, db: Session = Depends(get_db)) -> RegisterResp
     matches = (
         db.execute(
             select(User).where(
-                (User.username == payload.username) | (User.email == str(payload.email))
+                (func.lower(User.username) == payload.username.lower())
+                | (User.email == str(payload.email))
             )
         )
         .scalars()
@@ -61,15 +62,16 @@ def register(payload: UserCreate, db: Session = Depends(get_db)) -> RegisterResp
     )
 
     reapplying: User | None = None
+    username_lower = payload.username.lower()
     if (
         len(matches) == 1
         and matches[0].approval_status == ApprovalStatus.REJECTED
-        and matches[0].username == payload.username
+        and matches[0].username.lower() == username_lower
         and matches[0].email == str(payload.email)
     ):
         reapplying = matches[0]
     elif matches:
-        field = "username" if matches[0].username == payload.username else "email"
+        field = "username" if matches[0].username.lower() == username_lower else "email"
         raise api_error(
             status.HTTP_409_CONFLICT,
             "already_registered",
@@ -109,9 +111,16 @@ def register(payload: UserCreate, db: Session = Depends(get_db)) -> RegisterResp
 @router.post("/login", response_model=AuthResponse)
 def login(payload: LoginRequest, db: Session = Depends(get_db)) -> AuthResponse:
     """Exchange username + password for a token pair."""
-    user = db.execute(
-        select(User).where(User.username == payload.username)
-    ).scalar_one_or_none()
+    # .first() + ordering: legacy rows differing only in case must never cause a 500.
+    user = (
+        db.execute(
+            select(User)
+            .where(func.lower(User.username) == payload.username.lower())
+            .order_by(User.id)
+        )
+        .scalars()
+        .first()
+    )
 
     # Same message for unknown user and wrong password: no account enumeration.
     if user is None or not verify_password(payload.password, user.hashed_password):

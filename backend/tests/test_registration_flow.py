@@ -185,3 +185,52 @@ def test_reapply_keeps_customer_role_and_active(client, db):
     user = _get(db, "newparent")
     assert user.role == UserRole.CUSTOMER
     assert user.is_active is True
+
+
+def test_login_username_is_case_insensitive(client, customer_user):
+    response = client.post(
+        "/api/auth/login", json={"username": "SHOPPER", "password": "Customer123!"}
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["access_token"]
+    assert body["refresh_token"]
+
+
+def test_login_wrong_password_with_different_casing_is_401(client, customer_user):
+    response = client.post(
+        "/api/auth/login", json={"username": "SHOPPER", "password": "Wrong123456"}
+    )
+    assert response.status_code == 401
+    assert response.json()["error"]["code"] == "invalid_credentials"
+
+
+def test_register_username_differing_only_in_case_is_409(client, customer_user):
+    response = _register(client, username="Shopper", email="fresh@example.com")
+    assert response.status_code == 409
+    assert response.json()["error"]["field"] == "username"
+
+
+def test_reapply_with_different_username_casing_updates_stored_casing(client, db):
+    _register(client)
+    _reject(db, "newparent")
+
+    response = _register(client, username="NewParent")
+    assert response.status_code == 201
+
+    db.expire_all()
+    users = db.execute(select(User)).scalars().all()
+    assert len(users) == 1
+    assert users[0].username == "NewParent"
+    assert users[0].approval_status == ApprovalStatus.PENDING
+
+
+def test_reapply_with_only_username_matching_in_other_case_is_409(client, db):
+    _register(client)
+    _reject(db, "newparent")
+    before = _snapshot(_get(db, "newparent"))
+
+    response = _register(client, username="NEWPARENT", email="stranger@example.com")
+    assert response.status_code == 409
+    assert response.json()["error"]["field"] == "username"
+    assert _snapshot(_get(db, "newparent")) == before
