@@ -1,5 +1,14 @@
 import { api } from './client'
-import type { AdminStats, Category, Order, OrderStatus, Paged, Product } from '../types'
+import type {
+  AdminStats,
+  Category,
+  Order,
+  OrderStatus,
+  Paged,
+  Product,
+  Registration,
+  RegistrationDecision,
+} from '../types'
 
 export interface ProductPayload {
   name: string
@@ -19,6 +28,22 @@ export interface ProductPayload {
 export const adminApi = {
   async stats(): Promise<AdminStats> {
     const { data } = await api.get<AdminStats>('/admin/stats')
+    return data
+  },
+  async registrations(page = 1, pageSize = 20): Promise<Paged<Registration>> {
+    const { data } = await api.get<Paged<Registration>>('/admin/registrations', {
+      params: { status: 'pending', page, page_size: pageSize },
+    })
+    return data
+  },
+  async approveRegistration(id: number): Promise<RegistrationDecision> {
+    const { data } = await api.post<RegistrationDecision>(`/admin/registrations/${id}/approve`)
+    return data
+  },
+  async rejectRegistration(id: number, reason: string): Promise<RegistrationDecision> {
+    const { data } = await api.post<RegistrationDecision>(`/admin/registrations/${id}/reject`, {
+      reason,
+    })
     return data
   },
   async products(page = 1, pageSize = 20, q?: string): Promise<Paged<Product>> {

@@ -55,6 +55,18 @@ export default function AdminOverviewPage() {
     <div className="space-y-8">
       <ErrorBanner message={error} />
 
+      {stats && stats.pending_approvals > 0 && (
+        <Link
+          to="/admin/approvals"
+          className="card flex items-center justify-between border-l-4 border-red-500 p-5 hover:bg-orange-50"
+        >
+          <span className="font-display text-lg text-ink-900">
+            {stats.pending_approvals} registration{stats.pending_approvals === 1 ? '' : 's'} waiting for approval
+          </span>
+          <span className="text-sm font-semibold text-brand-700">Review →</span>
+        </Link>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {tiles.map((tile) => (
           <div key={tile.label} className="card p-5">

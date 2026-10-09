@@ -20,6 +20,7 @@ import OrderDetailPage from './pages/OrderDetailPage'
 import OrdersPage from './pages/OrdersPage'
 import ProductDetailPage from './pages/ProductDetailPage'
 import RegisterPage from './pages/RegisterPage'
+import AdminApprovalsPage from './pages/admin/AdminApprovalsPage'
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage'
 import AdminOrdersPage from './pages/admin/AdminOrdersPage'
 import AdminOverviewPage from './pages/admin/AdminOverviewPage'
@@ -69,6 +70,7 @@ export default function App() {
         <Route element={<AdminRoute />}>
           <Route path="admin" element={<AdminLayout />}>
             <Route index element={<AdminOverviewPage />} />
+            <Route path="approvals" element={<AdminApprovalsPage />} />
             <Route path="products" element={<AdminProductsPage />} />
             <Route path="categories" element={<AdminCategoriesPage />} />
             <Route path="orders" element={<AdminOrdersPage />} />

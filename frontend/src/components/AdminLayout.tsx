@@ -1,7 +1,11 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
+
+import { adminApi } from '../api/admin'
 
 const TABS = [
   { to: '/admin', label: 'Overview', end: true },
+  { to: '/admin/approvals', label: 'Approvals' },
   { to: '/admin/products', label: 'Products' },
   { to: '/admin/categories', label: 'Categories' },
   { to: '/admin/orders', label: 'Orders' },
@@ -9,6 +13,13 @@ const TABS = [
 
 /** Chrome around the admin dashboard pages. */
 export default function AdminLayout() {
+  const [pending, setPending] = useState(0)
+  const location = useLocation()
+
+  useEffect(() => {
+    adminApi.stats().then((stats) => setPending(stats.pending_approvals)).catch(() => {})
+  }, [location.pathname])
+
   return (
     <div>
       <div className="mb-6">
@@ -31,6 +42,11 @@ export default function AdminLayout() {
             }
           >
             {tab.label}
+            {tab.to === '/admin/approvals' && pending > 0 && (
+              <span className="ml-2 rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
+                {pending}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>
