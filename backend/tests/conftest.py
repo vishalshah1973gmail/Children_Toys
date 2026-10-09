@@ -15,6 +15,10 @@ from sqlalchemy.orm import Session, sessionmaker
 os.environ.setdefault("JWT_SECRET_KEY", "test-secret-key-not-used-in-production")
 os.environ.setdefault("STRIPE_SECRET_KEY", "")
 os.environ.setdefault("ALLOW_DEV_PAYMENT", "true")
+# Forced, not setdefault: backend/.env holds live SMTP and Lyzr settings, and tests
+# that register users or check out as guests must never send real email or call Lyzr.
+for _name in ("SMTP_HOST", "ADMIN_NOTIFY_EMAIL", "LYZR_API_KEY", "LYZR_AGENT_ID"):
+    os.environ[_name] = ""
 
 from app.core.security import hash_password  # noqa: E402
 from app.db.base import Base  # noqa: E402
