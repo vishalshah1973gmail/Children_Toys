@@ -42,4 +42,12 @@ Stop-ByPidFile $FrontendPidFile "frontend"
 Stop-ByPort 8000 "backend"
 Stop-ByPort 5173 "frontend"
 
+if (Get-Command docker -ErrorAction SilentlyContinue) {
+    $tunnelId = docker ps -aq --filter "name=^toybox-tunnel$" 2>$null
+    if ($tunnelId) {
+        Write-Host "Stopping Cloudflare tunnel container..."
+        docker rm -f toybox-tunnel 2>$null | Out-Null
+    }
+}
+
 Write-Host "ToyBox stopped." -ForegroundColor Green

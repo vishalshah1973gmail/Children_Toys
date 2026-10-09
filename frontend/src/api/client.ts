@@ -2,7 +2,7 @@ import axios, { AxiosError, type AxiosInstance, type InternalAxiosRequestConfig 
 
 import type { ApiError, TokenPair } from '../types'
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
 
 const ACCESS_KEY = 'toybox.access_token'
 const REFRESH_KEY = 'toybox.refresh_token'

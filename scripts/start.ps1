@@ -96,6 +96,39 @@ if ($healthy) {
     Write-Host "Backend did not report healthy within 45s. Check scripts\logs\backend.err.log" -ForegroundColor Yellow
 }
 
+# --- Cloudflare tunnel (docker) -------------------------------------------------
+# Token is read from CLOUDFLARE_TUNNEL_TOKEN in backend\.env (gitignored), so it never lives in this file.
+# Passed via -e TUNNEL_TOKEN so it does not show in the process list either.
+
+$TunnelContainer = "toybox-tunnel"
+
+function Get-EnvFileValue($Path, $Key) {
+    if (-not (Test-Path $Path)) { return $null }
+    $line = Get-Content $Path | Where-Object { $_ -match "^\s*$Key\s*=" } | Select-Object -First 1
+    if (-not $line) { return $null }
+    $value = ($line -replace "^\s*$Key\s*=\s*", "") -replace "\s+#.*$", ""
+    return $value.Trim().Trim('"').Trim("'")
+}
+
+$TunnelToken = Get-EnvFileValue (Join-Path $BackendDir ".env") "CLOUDFLARE_TUNNEL_TOKEN"
+
+if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+    Write-Host "docker not found - skipping Cloudflare tunnel." -ForegroundColor Yellow
+} elseif (-not $TunnelToken) {
+    Write-Host "CLOUDFLARE_TUNNEL_TOKEN not set in backend\.env - skipping Cloudflare tunnel." -ForegroundColor Yellow
+} else {
+    docker rm -f $TunnelContainer 2>$null | Out-Null
+    $env:TUNNEL_TOKEN = $TunnelToken
+    Write-Host "Starting Cloudflare tunnel container ($TunnelContainer) ..."
+    docker run -d --name $TunnelContainer --restart unless-stopped -e TUNNEL_TOKEN cloudflare/cloudflared:latest tunnel --no-autoupdate run | Out-Null
+    Remove-Item Env:TUNNEL_TOKEN -ErrorAction SilentlyContinue
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Tunnel started: https://toybox.demoaiprojects.com" -ForegroundColor Green
+    } else {
+        Write-Host "Tunnel container failed to start. Is Docker Desktop running?" -ForegroundColor Yellow
+    }
+}
+
 Write-Host ""
 Write-Host "ToyBox is starting up:" -ForegroundColor Cyan
 Write-Host "  Backend  : http://localhost:8000  (API docs at /docs)"
