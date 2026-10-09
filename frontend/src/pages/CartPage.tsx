@@ -190,13 +190,12 @@ export default function CartPage() {
             {user ? 'Proceed to checkout' : 'Sign in to check out'}
           </button>
           {!user && (
-            <button
-              type="button"
-              className="btn-secondary w-full py-3 text-lg"
-              onClick={() => navigate('/checkout/guest')}
-            >
-              Checkout as guest
-            </button>
+            <p className="text-center text-sm text-ink-700">
+              Log in or register to check out.{' '}
+              <Link to="/register" className="font-medium underline">
+                Create an account
+              </Link>
+            </p>
           )}
         </div>
 

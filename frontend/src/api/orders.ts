@@ -1,8 +1,6 @@
 import { api } from './client'
 import type {
   CheckoutSession,
-  GuestCheckoutRequestBody,
-  GuestCheckoutResponseBody,
   Order,
   Paged,
   ShippingAddressInput,
@@ -31,10 +29,6 @@ export const ordersApi = {
   },
   async devConfirm(orderNumber: string): Promise<Order> {
     const { data } = await api.post<Order>(`/checkout/dev-confirm/${orderNumber}`)
-    return data
-  },
-  async guestCheckout(body: GuestCheckoutRequestBody): Promise<GuestCheckoutResponseBody> {
-    const { data } = await api.post<GuestCheckoutResponseBody>('/checkout/guest', body)
     return data
   },
 }

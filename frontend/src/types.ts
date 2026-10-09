@@ -217,42 +217,6 @@ export interface CatalogQuery {
   page_size?: number
 }
 
-export type CardBrand = 'visa' | 'mastercard' | 'discover' | 'amex'
-
-export interface GuestAddressInput {
-  name: string
-  line1: string
-  line2?: string | null
-  city: string
-  state: string
-  postal_code: string
-  country: string
-}
-
-export interface CardDetailsInput {
-  brand: CardBrand
-  number: string
-  name_on_card: string
-  exp_month: number
-  exp_year: number
-  cvv: string
-  postal_code: string
-}
-
-export interface GuestCheckoutRequestBody {
-  contact_email: string
-  billing_address: GuestAddressInput
-  card: CardDetailsInput
-  same_as_billing: boolean
-  shipping_address?: GuestAddressInput | null
-  items: { product_id: number; quantity: number }[]
-}
-
-export interface GuestCheckoutResponseBody {
-  order: Order
-  email_sent: boolean
-}
-
 export interface ChatProduct {
   slug: string
   name: string

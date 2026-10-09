@@ -27,7 +27,7 @@ test('unrelated text still gets three suggestions', () => {
 })
 
 test('suggestions have no duplicates', () => {
-  const result = followUpQuestions('checkout card payment', 'guest checkout card cart', [])
+  const result = followUpQuestions('checkout card payment', 'checkout card cart', [])
   assert.equal(new Set(result).size, result.length)
 })
 

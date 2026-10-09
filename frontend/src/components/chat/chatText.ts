@@ -16,7 +16,7 @@ export type Block =
 // Product pages in older knowledge-base text use this address.
 const LOCAL_DEV_ORIGIN = 'http://localhost:5173'
 const SITE_ROUTE =
-  'catalog(?:\\?[\\w=&%.-]*)?|cart|login|register|feedback|orders|account|checkout\\/guest|product\\/[a-z0-9-]+'
+  'catalog(?:\\?[\\w=&%.-]*)?|cart|login|register|feedback|orders|account|product\\/[a-z0-9-]+'
 const SITE_PATH = new RegExp(`^\\/(?:${SITE_ROUTE})$`)
 // No lookbehind (unsupported before Safari 16.4, where a bad regex would break the whole site
 // at import time), and every quantifier on reply text is bounded so odd input cannot make it slow.

@@ -12,7 +12,6 @@ import CheckoutCancelPage from './pages/CheckoutCancelPage'
 import CheckoutPage from './pages/CheckoutPage'
 import CheckoutSuccessPage from './pages/CheckoutSuccessPage'
 import FeedbackPage from './pages/FeedbackPage'
-import GuestCheckoutPage from './pages/GuestCheckoutPage'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import NotFoundPage from './pages/NotFoundPage'
@@ -56,7 +55,6 @@ export default function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="checkout/cancel" element={<CheckoutCancelPage />} />
-        <Route path="checkout/guest" element={<GuestCheckoutPage />} />
         <Route path="feedback" element={<FeedbackPage />} />
 
         <Route element={<ProtectedRoute />}>

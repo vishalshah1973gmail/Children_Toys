@@ -3,7 +3,7 @@
 
 export const STARTER_QUESTIONS = [
   'How much is shipping?',
-  'How do I check out as a guest?',
+  'Can I check out without an account?',
   'Which test card can I use?',
   'How do I find toys for a 4-year-old?',
 ]
@@ -14,15 +14,15 @@ const TOPICS: { pattern: RegExp; questions: string[] }[] = [
     questions: [
       'How much tax will I pay?',
       'What is the total for a $30.00 order?',
-      'How do I check out as a guest?',
+      'Can I check out without an account?',
     ],
   },
   {
-    pattern: /guest|checkout|card|payment|expir/i,
+    pattern: /checkout|card|payment|expir/i,
     questions: [
       'Which test card can I use?',
       'Will my card really be charged?',
-      'Will I see my order in my order history after guest checkout?',
+      'Will I get a receipt email?',
     ],
   },
   {
@@ -30,7 +30,7 @@ const TOPICS: { pattern: RegExp; questions: string[] }[] = [
     questions: [
       'Do I need an account to add things to the cart?',
       'How much is shipping?',
-      'How do I check out as a guest?',
+      'Can I check out without an account?',
     ],
   },
   {
@@ -54,14 +54,14 @@ const TOPICS: { pattern: RegExp; questions: string[] }[] = [
     questions: [
       'Where do I send feedback or a complaint?',
       'What is your returns policy?',
-      'Will I see my order in my order history after guest checkout?',
+      'Will I get a receipt email?',
     ],
   },
 ]
 
 const GENERIC = [
   'How much is shipping?',
-  'How do I check out as a guest?',
+  'Can I check out without an account?',
   'Where do I send feedback or a complaint?',
 ]
 
