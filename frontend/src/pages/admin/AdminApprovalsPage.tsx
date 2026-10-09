@@ -17,6 +17,7 @@ export default function AdminApprovalsPage() {
   const [busyId, setBusyId] = useState<number | null>(null)
   const [rejecting, setRejecting] = useState<Registration | null>(null)
   const [reason, setReason] = useState('')
+  const [dialogError, setDialogError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     try {
@@ -43,6 +44,7 @@ export default function AdminApprovalsPage() {
   async function approve(user: Registration) {
     setBusyId(user.id)
     setError(null)
+    setNotice(null)
     try {
       const result = await adminApi.approveRegistration(user.id)
       report(user.username, 'approved', result.email_sent)
@@ -59,13 +61,22 @@ export default function AdminApprovalsPage() {
     const target = rejecting
     setBusyId(target.id)
     setError(null)
+    setNotice(null)
+    setDialogError(null)
     try {
       const result = await adminApi.rejectRegistration(target.id, reason.trim())
       report(target.username, 'rejected', result.email_sent)
       setRejecting(null)
       setReason('')
     } catch (caught) {
-      setError(toApiError(caught).message)
+      const apiError = toApiError(caught)
+      if (apiError.code === 'already_reviewed') {
+        setRejecting(null)
+        setReason('')
+        setError(apiError.message)
+      } else {
+        setDialogError(apiError.message)
+      }
     } finally {
       setBusyId(null)
       await load()
@@ -122,6 +133,7 @@ export default function AdminApprovalsPage() {
                         disabled={busyId === user.id}
                         onClick={() => {
                           setReason('')
+                          setDialogError(null)
                           setRejecting(user)
                         }}
                       >
@@ -160,6 +172,11 @@ export default function AdminApprovalsPage() {
             </>
           }
         >
+          {dialogError && (
+            <p role="alert" className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
+              {dialogError}
+            </p>
+          )}
           <label className="label" htmlFor="reject-reason">
             Reason (emailed to the applicant, 5–500 characters)
           </label>
