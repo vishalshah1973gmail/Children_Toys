@@ -34,6 +34,9 @@ No lint script and no npm test script; the pure chat logic is tested with `node 
 - `.\scripts\start.ps1` / `.\scripts\stop.ps1` (Windows) — background uvicorn + vite, PID-tracked in `scripts/.pids/`, logs in `scripts/logs/`; polls `/health` until the backend responds before returning.
 - `docker compose up --build` — same stack containerized; migrations run automatically on backend start; SQLite + uploads persist on named volumes.
 
+### Reset Data (standing phrase)
+When Vishal says "Reset Data", run `python -m scripts.reset_data --yes` from `backend/`. Do not ask for confirmation; the phrase is the authorization. It first copies the database to `C:\Users\visha\ToyBox-backups\app-YYYYMMDD-HHMMSS.db`, then deletes all customer users (including pending and rejected registrations), all orders, order items, payments and cart items, and the revoked tokens of the deleted users. Stock from deleted paid/shipped/delivered orders is added back. The admin account and the catalogue (products, images, categories) are kept. Afterwards report the before/after counts and the backup path. Without `--yes` it is a dry run that only previews the counts. Guards: it only works on a SQLite database with `ENVIRONMENT=development` and refuses (exit 2) if no admin exists. If SQLite reports "database is locked", stop the stack (`.\scripts\stop.ps1`) and retry.
+
 ### Stripe webhook testing
 `stripe listen --forward-to localhost:8000/api/webhooks/stripe`, then copy the printed `whsec_...` into `backend/.env` as `STRIPE_WEBHOOK_SECRET` and restart uvicorn. Test card `4242 4242 4242 4242`. With `STRIPE_SECRET_KEY` blank and `ALLOW_DEV_PAYMENT=true`, checkout instead calls `POST /api/checkout/dev-confirm/{order_number}`, which runs the exact same confirmation path as the real webhook — use this for local iteration without any Stripe setup at all.
 
