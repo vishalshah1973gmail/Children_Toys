@@ -1,9 +1,12 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 import { sendChatMessage } from '../api/chat'
 import { toApiError } from '../api/client'
+import { useAuthStore } from '../store/authStore'
 import type { ChatProduct } from '../types'
+import Dialog from './Dialog'
+import { CHAT_LOGIN_REQUIRED_MESSAGE } from './chat/chatGate'
 import ChatMessageBody from './chat/ChatMessageBody'
 import MessageActions from './chat/MessageActions'
 import ProductCard from './chat/ProductCard'
@@ -100,6 +103,8 @@ function Avatar({ size }: { size: 'sm' | 'md' }) {
 
 export default function ChatWidget() {
   const location = useLocation()
+  const user = useAuthStore((state) => state.user)
+  const [gateOpen, setGateOpen] = useState(false)
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>(() => [greeting()])
   const [draft, setDraft] = useState('')
@@ -123,6 +128,24 @@ export default function ChatWidget() {
     ensureChatFont()
     inputRef.current?.focus()
   }, [open])
+
+  // A different person (or none) is now signed in: close the panel and wipe the conversation.
+  const userId = user?.id ?? null
+  useEffect(() => {
+    chatGeneration.current += 1
+    inFlight.current = false
+    sessionId.current = null
+    setOpen(false)
+    setMessages([greeting()])
+    setDraft('')
+    setError(null)
+    setPending(false)
+    try {
+      localStorage.removeItem(SESSION_KEY)
+    } catch {
+      // Storage blocked: nothing persisted to clear.
+    }
+  }, [userId])
 
   // Hooks above must all run before this early return.
   if (location.pathname.startsWith('/admin')) return null
@@ -183,6 +206,14 @@ export default function ChatWidget() {
     setError(null)
     setPending(false)
     inputRef.current?.focus()
+  }
+
+  function openChat() {
+    if (!user) {
+      setGateOpen(true)
+      return
+    }
+    setOpen(true)
   }
 
   const hasUserMessage = messages.some((message) => message.role === 'user')
@@ -343,7 +374,7 @@ export default function ChatWidget() {
           type="button"
           tabIndex={-1}
           aria-hidden="true"
-          onClick={() => setOpen(true)}
+          onClick={openChat}
           className="rounded-full bg-white px-4 py-2 text-sm font-bold text-ink-900 shadow-lg ring-1 ring-ink-800/10 hover:bg-orange-50"
         >
           Chat with us
@@ -352,7 +383,7 @@ export default function ChatWidget() {
       <button
         ref={launcherRef}
         type="button"
-        onClick={() => setOpen((current) => !current)}
+        onClick={() => (open ? setOpen(false) : openChat())}
         aria-expanded={open}
         aria-label={open ? 'Close chat' : 'Open chat'}
         title={open ? 'Close chat' : 'Chat with us'}
@@ -394,6 +425,32 @@ export default function ChatWidget() {
         )}
       </button>
       </div>
+      {gateOpen && (
+        <Dialog
+          title="Please log in to chat"
+          onClose={() => setGateOpen(false)}
+          actions={
+            <>
+              <Link
+                to="/register"
+                onClick={() => setGateOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm font-medium text-ink-700 hover:bg-orange-100"
+              >
+                Register
+              </Link>
+              <Link
+                to="/login"
+                onClick={() => setGateOpen(false)}
+                className="btn-primary px-4 py-2 text-sm"
+              >
+                Log in
+              </Link>
+            </>
+          }
+        >
+          {CHAT_LOGIN_REQUIRED_MESSAGE}
+        </Dialog>
+      )}
     </div>
   )
 }
