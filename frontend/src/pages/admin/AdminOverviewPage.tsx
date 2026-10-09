@@ -55,10 +55,12 @@ export default function AdminOverviewPage() {
     <div className="space-y-8">
       <ErrorBanner message={error} />
 
-      {stats && stats.pending_approvals > 0 && (
+      {stats && (
         <Link
           to="/admin/approvals"
-          className="card flex items-center justify-between border-l-4 border-red-500 p-5 hover:bg-orange-50"
+          className={`card flex items-center justify-between p-5 hover:bg-orange-50 ${
+            stats.pending_approvals > 0 ? 'border-l-4 border-red-500' : ''
+          }`}
         >
           <span className="font-display text-lg text-ink-900">
             {stats.pending_approvals} registration{stats.pending_approvals === 1 ? '' : 's'} waiting for approval

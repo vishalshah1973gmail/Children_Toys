@@ -26,7 +26,7 @@ export default function LoginPage() {
     try {
       const user = await login(username.trim(), password)
       await mergeGuestCart()
-      navigate(user.role === 'admin' && redirectTo === '/' ? '/admin' : redirectTo, {
+      navigate(user.role === 'admin' ? '/admin' : redirectTo, {
         replace: true,
       })
     } catch (caught) {
