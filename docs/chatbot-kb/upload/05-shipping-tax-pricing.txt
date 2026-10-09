@@ -1,7 +1,7 @@
 # Shipping, Tax and Pricing
 
 Topic: How shipping, sales tax and the order total are calculated.
-Source: Cart page (/cart) and both checkout pages (/checkout, /checkout/guest)
+Source: Cart page (/cart) and the checkout page (/checkout)
 
 ## How much is shipping?
 

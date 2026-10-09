@@ -96,7 +96,7 @@ ECommerce_Website/
 │       ├── conftest.py  test_auth.py  test_admin_access.py
 │       ├── test_cart.py  test_checkout.py  test_chat.py  test_chat_products.py
 ├── docs/
-│   └── chatbot-kb/              chatbot knowledge pack (docs 00-08, products.md,
+│   └── chatbot-kb/              chatbot knowledge pack (docs 00-02 and 04-08, products.md,
 │                                test-questions.md); _crawl/ is scratch, not ingested
 └── frontend/
     ├── Dockerfile  nginx.conf  index.html  package.json
@@ -594,8 +594,8 @@ through the `font-chat` class. Its Google Fonts stylesheet is requested from
 fonts.googleapis.com only the first time a visitor opens the chat (injected by
 `ChatWidget.tsx`); nothing is requested from Google on other page loads.
 
-**Knowledge pack.** What the agent knows lives in `docs/chatbot-kb/`: nine
-hand-written docs (`00`-`08`), a generated `products.md`, and `test-questions.md`,
+**Knowledge pack.** What the agent knows lives in `docs/chatbot-kb/`: eight
+hand-written docs (`00`-`02` and `04`-`08`), a generated `products.md`, and `test-questions.md`,
 a golden list of questions for checking the agent's answers. To refresh the
 product data, run this from `backend/` and then re-upload the files to Lyzr,
 chunking by heading:

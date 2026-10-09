@@ -9,7 +9,7 @@ ToyBox has no published returns policy; use the Feedback page. ToyBox also publi
 
 ## Is ToyBox a real store? Are payments real?
 
-ToyBox is a demo store. Account checkout uses Stripe in test mode and guest checkout is a simulated payment, so no real card is charged and no real toys are shipped. The footer states: "Demo store - payments run in Stripe test mode."
+ToyBox is a demo store. Checkout uses Stripe in test mode, so no real card is charged and no real toys are shipped. The footer states: "Demo store - payments run in Stripe test mode."
 
 ## What can the assistant not do?
 
@@ -37,7 +37,7 @@ Every toy lists its manufacturer age range and safety notes on its product page.
 
 ## What card details does ToyBox keep?
 
-When a guest checks out, ToyBox checks the card details and then keeps only the card brand, the last four digits and the expiry month and year with the payment record. It does not keep the full card number or the security code (CVV). The order also keeps the name, billing address and shipping address entered at checkout. The assistant itself does not handle card data. Never type a real card number, password or personal secret into the chat; use the standard test card 4242 4242 4242 4242 in the checkout forms.
+Card details are entered on Stripe's payment page, not on ToyBox, so ToyBox does not keep card numbers or security codes. The order keeps the name, shipping address and contact email entered at checkout. The assistant itself does not handle card data. Never type a real card number, password or personal secret into the chat; use the standard test card 4242 4242 4242 4242 on the payment page.
 
 ## What is the limit on how much I can order?
 

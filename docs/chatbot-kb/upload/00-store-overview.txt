@@ -9,7 +9,7 @@ ToyBox is an online toy store for children ages 0 to 14. Every toy lists its rea
 
 ## Is ToyBox a real store? Will my card be charged?
 
-ToyBox is a demo store. Account checkout uses Stripe in test mode, so no real money moves, and the test card 4242 4242 4242 4242 (any future expiry, any security code) is the card to use. Guest checkout is a simulated payment: it checks the card details but never contacts a real card processor and never makes a real charge. Do not expect real toys to ship.
+ToyBox is a demo store. Checkout uses Stripe in test mode, so no real money moves, and the test card 4242 4242 4242 4242 (any future expiry, any security code) is the card to use. Do not expect real toys to ship.
 
 ## What kinds of toys does ToyBox sell?
 
@@ -30,7 +30,7 @@ The footer has shortcuts to All toys, Best value (all toys sorted by lowest pric
 
 ## Do I need an account to shop?
 
-No. Anyone can browse, fill a cart and check out as a guest without an account. An account adds order history, a saved cart, and the Stripe-based checkout.
+Not to browse or fill a cart. Checking out needs an account: register, wait for an administrator to approve it, then sign in. An account also gives you order history and a saved cart.
 
 ## Who can use the ToyBox assistant?
 
@@ -38,4 +38,4 @@ The chat assistant is only available to registered shoppers who are signed in wi
 
 ## What can the ToyBox assistant help with?
 
-The assistant answers questions about browsing and finding toys, the cart, guest and account checkout, shipping, tax and totals, receipts and order history, creating an account and signing in, and the Feedback page. It cannot look up orders, change accounts or handle refunds; the Feedback page is the place for those requests.
+The assistant answers questions about browsing and finding toys, the cart, checkout, shipping, tax and totals, receipts and order history, creating an account and signing in, and the Feedback page. It cannot look up orders, change accounts or handle refunds; the Feedback page is the place for those requests.

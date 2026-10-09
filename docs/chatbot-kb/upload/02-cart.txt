@@ -5,7 +5,7 @@ Source: /cart (and "Add to cart" buttons on /catalog, the home page and product 
 
 ## How do I add a toy to my cart?
 
-Press "Add to cart" on a toy card or on its product page. On a product page, set the quantity first if you want more than one. You do not need to sign in: the cart works for guests, and the Cart link in the header shows a number badge once it has items.
+Press "Add to cart" on a toy card or on its product page. On a product page, set the quantity first if you want more than one. You do not need to sign in: the cart works before you sign in, and the Cart link in the header shows a number badge once it has items.
 
 ## How do I change the quantity of an item in my cart?
 
@@ -25,11 +25,11 @@ The quantity in the cart is higher than the stock available for that toy. Lower 
 
 ## Do I need an account to use the cart?
 
-No. Guests can add items and check out as a guest. New accounts need administrator approval before they can sign in. The items in the guest cart are merged into the account cart the first time the shopper signs in after approval, so nothing is lost.
+Not to add items. Checking out needs an account: register, wait for administrator approval, then sign in. The items in the guest cart are merged into the account cart the first time the shopper signs in after approval, so nothing is lost.
 
 ## What are the checkout buttons on the cart page?
 
-When signed out, the cart page shows two buttons: "Sign in to check out" (which takes you to sign in and then on to checkout) and "Checkout as guest". When signed in, there is a single "Proceed to checkout" button, and guest checkout is not shown.
+When signed out, the cart page shows "Sign in to check out" (which takes you to sign in and then on to checkout) and a note to log in or register, with a "Create an account" link. When signed in, the button reads "Proceed to checkout".
 
 ## How are the shipping, tax and total in my cart worked out?
 

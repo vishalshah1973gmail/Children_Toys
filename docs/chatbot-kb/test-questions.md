@@ -20,7 +20,7 @@ Expected: A demo online toy store for ages 0 to 14 selling toys in five categori
 Source: 00-store-overview.md
 
 ## Q: Will my card really be charged?
-Expected: No. Demo store; Stripe in test mode, and guest checkout is a simulated payment.
+Expected: No. Demo store; Stripe in test mode.
 Source: 00-store-overview.md
 
 ## Q: How do I find toys for a 4-year-old?
@@ -40,32 +40,20 @@ Expected: $94.99 (Northlight, ages 8 to 16 years); confirm live price on the pro
 Source: products.md
 
 ## Q: Do I need an account to add things to the cart?
-Expected: No. Guests can use the cart; it merges into the account cart on sign-in.
+Expected: Not to add items. Visitors can use the cart; it merges into the account cart on sign-in. Checking out needs an account.
 Source: 02-cart.md
 
 ## Q: What does "Only 3 left - reduce the quantity to check out" mean?
 Expected: The cart quantity exceeds the stock; lower the quantity.
 Source: 02-cart.md
 
-## Q: How do I check out as a guest?
-Expected: Cart, then "Checkout as guest"; four steps: Contact & billing, Payment, Shipping, Review; simulated payment.
-Source: 03-guest-checkout.md
-
-## Q: Why does it say my card has already expired?
-Expected: The expiry defaults to January of the current year, which is past; choose a future month and year.
-Source: 03-guest-checkout.md
-
 ## Q: Which test card can I use?
-Expected: Visa 4242 4242 4242 4242, future expiry (e.g. 12/2030), CVV 123, 5-digit zip.
-Source: 03-guest-checkout.md
+Expected: Visa 4242 4242 4242 4242, any future expiry and any security code (Stripe test mode).
+Source: 00-store-overview.md
 
-## Q: Why do I only see one card error at a time?
-Expected: The form shows the first problem found; fix it and resubmit to see the next.
-Source: 03-guest-checkout.md
-
-## Q: How long is an American Express security code?
-Expected: 4 digits; other cards use 3.
-Source: 03-guest-checkout.md
+## Q: Can I check out without an account?
+Expected: No. Register, wait for administrator approval, then sign in and check out.
+Source: 04-account-checkout.md
 
 ## Q: What are the password rules for a new account?
 Expected: 8 to 128 characters with at least one letter and one digit.
@@ -79,8 +67,8 @@ Source: 04-account-checkout.md
 Expected: It is merged into the account cart.
 Source: 04-account-checkout.md
 
-## Q: Will I see my order in my order history after guest checkout?
-Expected: No. Guest orders have no history; use the confirmation page and emailed receipt.
+## Q: Will I get a receipt email?
+Expected: No. There is no emailed receipt; order details are on the confirmation page and under My orders.
 Source: 06-orders-and-receipts.md
 
 ## Q: Where do I send feedback or a complaint?

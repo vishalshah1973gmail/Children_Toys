@@ -37,7 +37,7 @@ The page "Your account" shows your Username, Email, Name, Role and Member since 
 
 ## How do I check out when I am signed in?
 
-On the Cart page press "Proceed to checkout". The checkout has three steps: 1 Contact (Email for the receipt), 2 Shipping (Full name, Address, Apartment/suite which is optional, City, State, ZIP / postal code, Country) and 3 Review & pay. The review shows the shipping address, the receipt email, the items and a "Pay" button with the total.
+On the Cart page press "Proceed to checkout". The checkout has three steps: 1 Contact (the contact email kept with the order), 2 Shipping (Full name, Address, Apartment/suite which is optional, City, State, ZIP / postal code, Country) and 3 Review & pay. The review shows the shipping address, the contact email, the items and a "Pay" button with the total.
 
 ## Is account checkout a real payment?
 
@@ -51,6 +51,6 @@ After paying, the page shows "Confirming your payment..." while it checks the or
 
 If you leave the Stripe payment page, ToyBox shows "Payment cancelled": nothing has been charged and your cart is untouched. If an order number is shown, that order stays pending until it is paid. Use "Back to cart" or "Keep shopping" to continue.
 
-## Should I use guest checkout or an account?
+## Can I check out without an account?
 
-Guest checkout is quicker and needs no sign-up, but gives no order history. An account saves your orders so they appear in My orders. Both are demo payments and no real money is charged.
+No. Checking out needs an account. Register, wait for an administrator to approve it, then sign in and check out. You can fill a cart before signing in; it is merged into your account cart the first time you sign in. All payments are demo payments and no real money is charged.
