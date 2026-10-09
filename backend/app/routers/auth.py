@@ -61,7 +61,12 @@ def register(payload: UserCreate, db: Session = Depends(get_db)) -> RegisterResp
     )
 
     reapplying: User | None = None
-    if len(matches) == 1 and matches[0].approval_status == ApprovalStatus.REJECTED:
+    if (
+        len(matches) == 1
+        and matches[0].approval_status == ApprovalStatus.REJECTED
+        and matches[0].username == payload.username
+        and matches[0].email == str(payload.email)
+    ):
         reapplying = matches[0]
     elif matches:
         field = "username" if matches[0].username == payload.username else "email"

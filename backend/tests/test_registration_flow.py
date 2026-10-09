@@ -3,10 +3,8 @@
 from datetime import datetime, timezone
 from unittest.mock import patch
 
-import pytest
 from sqlalchemy import select
 
-from app.core.security import hash_password
 from app.models.user import ApprovalStatus, User, UserRole
 from tests.conftest import auth_headers
 
@@ -133,3 +131,57 @@ def test_rejected_user_can_reapply(client, db):
     from app.core.security import verify_password
 
     assert verify_password("NewPass2026", user.hashed_password)
+
+
+def _reject(db, username):
+    user = _get(db, username)
+    user.approval_status = ApprovalStatus.REJECTED
+    user.rejection_reason = "No"
+    db.commit()
+
+
+def _snapshot(user):
+    return (
+        user.username,
+        user.email,
+        user.full_name,
+        user.hashed_password,
+        user.approval_status,
+        user.role,
+        user.is_active,
+    )
+
+
+def test_reapply_with_only_username_matching_is_409_and_row_unchanged(client, db):
+    _register(client)
+    _reject(db, "newparent")
+    before = _snapshot(_get(db, "newparent"))
+
+    response = _register(
+        client, email="stranger@example.com", full_name="Stranger", password="Stranger2026"
+    )
+    assert response.status_code == 409
+    assert response.json()["error"]["field"] == "username"
+    assert _snapshot(_get(db, "newparent")) == before
+
+
+def test_reapply_with_only_email_matching_is_409_and_row_unchanged(client, db):
+    _register(client)
+    _reject(db, "newparent")
+    before = _snapshot(_get(db, "newparent"))
+
+    response = _register(
+        client, username="stranger", full_name="Stranger", password="Stranger2026"
+    )
+    assert response.status_code == 409
+    assert response.json()["error"]["field"] == "email"
+    assert _snapshot(_get(db, "newparent")) == before
+
+
+def test_reapply_keeps_customer_role_and_active(client, db):
+    _register(client)
+    _reject(db, "newparent")
+    assert _register(client).status_code == 201
+    user = _get(db, "newparent")
+    assert user.role == UserRole.CUSTOMER
+    assert user.is_active is True
