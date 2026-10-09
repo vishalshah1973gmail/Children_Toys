@@ -369,19 +369,7 @@ Storefront: <http://localhost:5173>
 
 ---
 
-## 7. Seeded logins
-
-| Username | Password | Role |
-|---|---|---|
-| `admin` | `Admin123!` | admin — can reach `/admin` |
-| `customer` | `Customer123!` | customer |
-
-The 50 synthetic customers (e.g. `priya.shah`) all share the password
-`Customer123!`.
-
----
-
-## 8. Running the tests
+## 7. Running the tests
 
 ```bash
 cd backend
@@ -408,7 +396,7 @@ stock only moves when payment is confirmed.
 
 ---
 
-## 9. Testing Stripe locally
+## 8. Testing Stripe locally
 
 The backend has two payment modes.
 
@@ -482,7 +470,7 @@ rest of the store is unaffected. See §13 for the chatbot itself.
 
 ---
 
-## 10. Docker
+## 9. Docker
 
 ```bash
 docker compose up --build
@@ -498,7 +486,7 @@ removed by `down -v`).
 
 ---
 
-## 11. The synthetic 2026 dataset
+## 10. The synthetic 2026 dataset
 
 `python -m scripts.generate_synthetic_data` writes five CSVs into
 `backend/data/`. The generator is deterministic — seed `2026` — so regenerating
@@ -536,7 +524,7 @@ python -m scripts.seed --reset          # then reload
 
 ---
 
-## 12. Design notes
+## 11. Design notes
 
 * **The browser is never trusted with money.** Cart lines are re-priced from
   the `products` table on every read; the checkout endpoint ignores any price
@@ -558,7 +546,7 @@ python -m scripts.seed --reset          # then reload
 
 ---
 
-## 13. Chatbot
+## 12. Chatbot
 
 A floating chat widget (`ChatWidget.tsx`, mounted in `Layout.tsx` and hidden on
 `/admin` pages) lets shoppers ask questions about the store. It calls the
