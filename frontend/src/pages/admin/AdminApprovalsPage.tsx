@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useOutletContext } from 'react-router-dom'
 
 import { adminApi } from '../../api/admin'
 import { toApiError } from '../../api/client'
+import type { AdminOutletContext } from '../../components/AdminLayout'
 import Dialog from '../../components/Dialog'
 import ErrorBanner from '../../components/ErrorBanner'
 import Spinner from '../../components/Spinner'
@@ -10,6 +12,7 @@ import type { Registration } from '../../types'
 
 /** Pending registrations with Approve / Reject (reason required). */
 export default function AdminApprovalsPage() {
+  const { refreshPending } = useOutletContext<AdminOutletContext>()
   const [items, setItems] = useState<Registration[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -53,6 +56,7 @@ export default function AdminApprovalsPage() {
     } finally {
       setBusyId(null)
       await load()
+      refreshPending()
     }
   }
 
@@ -80,6 +84,7 @@ export default function AdminApprovalsPage() {
     } finally {
       setBusyId(null)
       await load()
+      refreshPending()
     }
   }
 

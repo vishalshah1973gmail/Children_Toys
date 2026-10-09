@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 
 import { adminApi } from '../api/admin'
@@ -11,14 +11,35 @@ const TABS = [
   { to: '/admin/orders', label: 'Orders' },
 ]
 
+/** Context AdminLayout hands to its routed pages through <Outlet context={{ refreshPending } satisfies AdminOutletContext} />. */
+export type AdminOutletContext = { refreshPending: () => void }
+
 /** Chrome around the admin dashboard pages. */
 export default function AdminLayout() {
   const [pending, setPending] = useState(0)
   const location = useLocation()
 
+  const latestRequest = useRef(0)
+
+  const refreshPending = useCallback(() => {
+    const requestId = ++latestRequest.current
+    adminApi
+      .stats()
+      .then((stats) => {
+        if (requestId === latestRequest.current) setPending(stats.pending_approvals)
+      })
+      .catch(() => {})
+  }, [])
+
   useEffect(() => {
-    adminApi.stats().then((stats) => setPending(stats.pending_approvals)).catch(() => {})
-  }, [location.pathname])
+    refreshPending()
+  }, [location.pathname, refreshPending])
+
+  useEffect(() => {
+    return () => {
+      latestRequest.current = -1
+    }
+  }, [])
 
   return (
     <div>
@@ -51,7 +72,7 @@ export default function AdminLayout() {
         ))}
       </nav>
 
-      <Outlet />
+      <Outlet context={{ refreshPending } satisfies AdminOutletContext} />
     </div>
   )
 }
