@@ -1,8 +1,7 @@
-"""Guest-checkout receipt and registration emails, sent over real SMTP (Gmail + app password).
+"""Registration emails, sent over real SMTP (Gmail + app password).
 
-Raises on any failure. The caller decides whether that should block the
-checkout response — see routers/checkout.py, which logs and continues.
-Registration emails are sent best-effort via services/registration_service.py.
+send_mail raises on any failure; services/registration_service.py sends
+best-effort and logs instead of failing the request.
 """
 
 from __future__ import annotations
@@ -13,51 +12,7 @@ from email.mime.text import MIMEText
 from html import escape
 
 from app.core.config import settings
-from app.models.order import Order
 from app.models.user import User
-
-
-def _absolute_image_url(image_url: str | None) -> str:
-    if not image_url:
-        return ""
-    if image_url.startswith("http"):
-        return image_url
-    return f"{settings.public_base_url}{image_url if image_url.startswith('/') else '/' + image_url}"
-
-
-def _render_html(order: Order) -> str:
-    rows = "".join(
-        f"<tr><td><img src='{_absolute_image_url(item.image_url)}' width='48' /></td>"
-        f"<td>{item.product_name}</td><td>x{item.quantity}</td>"
-        f"<td>${item.line_total_cents / 100:.2f}</td></tr>"
-        for item in order.items
-    )
-    address = (
-        f"{order.shipping_name}<br>{order.shipping_line1}"
-        + (f"<br>{order.shipping_line2}" if order.shipping_line2 else "")
-        + f"<br>{order.shipping_city}, {order.shipping_state} {order.shipping_postal_code}"
-    )
-    return (
-        f"<h2>Thanks for your order, {order.shipping_name}!</h2>"
-        f"<p>Order {order.order_number}</p>"
-        f"<table>{rows}</table>"
-        f"<p><strong>Total: ${order.total_cents / 100:.2f}</strong></p>"
-        f"<p>Shipping to:<br>{address}</p>"
-    )
-
-
-def send_receipt(order: Order) -> None:
-    """Send the order receipt to order.contact_email. Raises on SMTP failure."""
-    message = MIMEMultipart("alternative")
-    message["Subject"] = f"Your ToyBox order {order.order_number}"
-    message["From"] = settings.email_from or settings.smtp_user
-    message["To"] = order.contact_email
-    message.attach(MIMEText(_render_html(order), "html"))
-
-    with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
-        server.starttls()
-        server.login(settings.smtp_user, settings.smtp_app_password)
-        server.sendmail(message["From"], [order.contact_email], message.as_string())
 
 
 class EmailNotConfigured(RuntimeError):

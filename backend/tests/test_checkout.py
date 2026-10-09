@@ -1,4 +1,4 @@
-"""Checkout rules: stock validation and deferred stock decrement."""
+"""Checkout rules: login required, stock validation and deferred stock decrement."""
 
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
@@ -96,3 +96,16 @@ def test_stock_decrements_only_when_payment_confirms(
     db.expire_all()
     assert db.get(Product, product.id).stock_quantity == 4
     assert client.get("/api/cart", headers=headers).json()["items"] == []
+
+
+def test_checkout_session_requires_login(client: TestClient) -> None:
+    response = client.post("/api/checkout/session", json=ADDRESS)
+
+    assert response.status_code == 401
+
+
+def test_guest_checkout_endpoint_is_gone(client: TestClient) -> None:
+    response = client.post("/api/checkout/guest", json={})
+
+    assert not 200 <= response.status_code < 300
+    assert response.status_code in (404, 405)

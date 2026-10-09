@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     free_shipping_threshold_cents: int = 5000
     tax_rate_bps: int = 663
 
-    # Email (guest checkout receipts)
+    # Email (registration notices)
     smtp_host: str = ""
     smtp_port: int = 587
     smtp_user: str = ""
