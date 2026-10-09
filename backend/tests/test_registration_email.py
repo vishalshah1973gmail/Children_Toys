@@ -93,3 +93,13 @@ def test_admin_recipient_prefers_setting_then_first_admin(smtp_on, db, admin_use
 def test_admin_notice_skipped_when_no_recipient(smtp_on, db, monkeypatch):
     monkeypatch.setattr(settings, "admin_notify_email", "")
     assert registration_service.notify_admin_new_registration(db, _applicant()) is False
+
+
+def test_notify_approved_never_raises_when_render_fails():
+    with patch.object(email_service, "render_approved", side_effect=RuntimeError("boom")):
+        assert registration_service.notify_approved(_applicant()) is False
+
+
+def test_notify_admin_never_raises_when_recipient_lookup_fails():
+    with patch.object(registration_service, "_admin_recipient", side_effect=RuntimeError("db down")):
+        assert registration_service.notify_admin_new_registration(None, _applicant()) is False

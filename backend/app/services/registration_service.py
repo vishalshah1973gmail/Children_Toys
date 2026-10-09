@@ -35,16 +35,30 @@ def _send(to: str, subject_and_html: tuple[str, str], what: str) -> bool:
 
 
 def notify_admin_new_registration(db: Session, user: User) -> bool:
-    recipient = _admin_recipient(db)
-    if recipient is None:
-        logger.warning("No admin email available for new registration %s", user.username)
+    try:
+        recipient = _admin_recipient(db)
+        if recipient is None:
+            logger.warning("No admin email available for new registration %s", user.username)
+            return False
+        return _send(
+            recipient, email_service.render_admin_notice(user), "admin registration notice"
+        )
+    except Exception:
+        logger.warning("Could not prepare admin registration notice", exc_info=True)
         return False
-    return _send(recipient, email_service.render_admin_notice(user), "admin registration notice")
 
 
 def notify_approved(user: User) -> bool:
-    return _send(user.email, email_service.render_approved(user), "approval")
+    try:
+        return _send(user.email, email_service.render_approved(user), "approval")
+    except Exception:
+        logger.warning("Could not prepare approval email", exc_info=True)
+        return False
 
 
 def notify_rejected(user: User) -> bool:
-    return _send(user.email, email_service.render_rejected(user), "rejection")
+    try:
+        return _send(user.email, email_service.render_rejected(user), "rejection")
+    except Exception:
+        logger.warning("Could not prepare rejection email", exc_info=True)
+        return False

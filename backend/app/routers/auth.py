@@ -19,17 +19,19 @@ from app.core.security import (
 )
 from app.db.session import get_db
 from app.models.token import RevokedToken
-from app.models.user import User, UserRole
+from app.models.user import ApprovalStatus, User, UserRole
 from app.schemas.common import Message
 from app.schemas.user import (
     AuthResponse,
     ChangePasswordRequest,
     LoginRequest,
     RefreshRequest,
+    RegisterResponse,
     TokenPair,
     UserCreate,
     UserRead,
 )
+from app.services import registration_service
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -45,17 +47,24 @@ def _issue_tokens(db: Session, user: User) -> TokenPair:
     )
 
 
-@router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
-def register(payload: UserCreate, db: Session = Depends(get_db)) -> AuthResponse:
-    """Create a customer account and sign the new user in."""
-    existing = db.execute(
-        select(User).where(
-            (User.username == payload.username) | (User.email == str(payload.email))
+@router.post("/register", response_model=RegisterResponse, status_code=status.HTTP_201_CREATED)
+def register(payload: UserCreate, db: Session = Depends(get_db)) -> RegisterResponse:
+    """Create a pending customer account. An admin must approve it before sign-in."""
+    matches = (
+        db.execute(
+            select(User).where(
+                (User.username == payload.username) | (User.email == str(payload.email))
+            )
         )
-    ).scalar_one_or_none()
+        .scalars()
+        .all()
+    )
 
-    if existing is not None:
-        field = "username" if existing.username == payload.username else "email"
+    reapplying: User | None = None
+    if len(matches) == 1 and matches[0].approval_status == ApprovalStatus.REJECTED:
+        reapplying = matches[0]
+    elif matches:
+        field = "username" if matches[0].username == payload.username else "email"
         raise api_error(
             status.HTTP_409_CONFLICT,
             "already_registered",
@@ -63,19 +72,33 @@ def register(payload: UserCreate, db: Session = Depends(get_db)) -> AuthResponse
             field=field,
         )
 
-    user = User(
-        username=payload.username,
-        email=str(payload.email),
-        full_name=payload.full_name,
-        hashed_password=hash_password(payload.password),
-        role=UserRole.CUSTOMER,
-    )
-    db.add(user)
+    if reapplying is not None:
+        user = reapplying
+        user.username = payload.username
+        user.email = str(payload.email)
+        user.full_name = payload.full_name
+        user.hashed_password = hash_password(payload.password)
+        user.approval_status = ApprovalStatus.PENDING
+        user.rejection_reason = None
+        user.reviewed_at = None
+    else:
+        user = User(
+            username=payload.username,
+            email=str(payload.email),
+            full_name=payload.full_name,
+            hashed_password=hash_password(payload.password),
+            role=UserRole.CUSTOMER,
+            approval_status=ApprovalStatus.PENDING,
+        )
+        db.add(user)
     db.commit()
     db.refresh(user)
 
-    tokens = _issue_tokens(db, user)
-    return AuthResponse(**tokens.model_dump(), user=UserRead.model_validate(user))
+    registration_service.notify_admin_new_registration(db, user)
+    return RegisterResponse(
+        status="pending",
+        message="Your registration approval is in progress. You will get an email once it is reviewed.",
+    )
 
 
 @router.post("/login", response_model=AuthResponse)
@@ -91,6 +114,18 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)) -> AuthResponse:
             status.HTTP_401_UNAUTHORIZED,
             "invalid_credentials",
             "Incorrect username or password",
+        )
+    if user.approval_status == ApprovalStatus.PENDING:
+        raise api_error(
+            status.HTTP_403_FORBIDDEN,
+            "approval_pending",
+            "Your registration is awaiting admin approval. You will get an email once it is reviewed.",
+        )
+    if user.approval_status == ApprovalStatus.REJECTED:
+        raise api_error(
+            status.HTTP_403_FORBIDDEN,
+            "registration_rejected",
+            f"Your registration was not approved. Reason: {user.rejection_reason or 'not given'}",
         )
     if not user.is_active:
         raise api_error(
@@ -125,7 +160,7 @@ def refresh(payload: RefreshRequest, db: Session = Depends(get_db)) -> TokenPair
         )
 
     user = db.get(User, int(claims["sub"]))
-    if user is None or not user.is_active:
+    if user is None or not user.is_active or user.approval_status != ApprovalStatus.APPROVED:
         raise api_error(
             status.HTTP_401_UNAUTHORIZED, "invalid_token", "Refresh token is invalid"
         )

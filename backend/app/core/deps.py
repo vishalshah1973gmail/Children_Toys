@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.core.errors import api_error
 from app.core.security import decode_token
 from app.db.session import get_db
-from app.models.user import User, UserRole
+from app.models.user import ApprovalStatus, User, UserRole
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -40,7 +40,11 @@ def get_current_user(
         raise _credentials_error("Invalid access token")
 
     user = db.get(User, user_id)
-    if user is None or not user.is_active:
+    if (
+        user is None
+        or not user.is_active
+        or user.approval_status != ApprovalStatus.APPROVED
+    ):
         raise _credentials_error("User account is unavailable")
     return user
 

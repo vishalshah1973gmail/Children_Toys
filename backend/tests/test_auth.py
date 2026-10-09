@@ -5,8 +5,8 @@ from fastapi.testclient import TestClient
 from tests.conftest import auth_headers
 
 
-def test_register_creates_customer_and_returns_tokens(client: TestClient) -> None:
-    """A new account is created as a customer and signed straight in."""
+def test_register_creates_pending_customer_without_tokens(client: TestClient, db) -> None:
+    """A new account is created pending: no tokens, no sign-in."""
     response = client.post(
         "/api/auth/register",
         json={
@@ -19,14 +19,16 @@ def test_register_creates_customer_and_returns_tokens(client: TestClient) -> Non
 
     assert response.status_code == 201, response.text
     body = response.json()
-    assert body["user"]["username"] == "newparent"
-    assert body["user"]["role"] == "customer"
-    assert body["access_token"] and body["refresh_token"]
-    assert "password" not in body["user"]
+    assert body["status"] == "pending"
+    assert "access_token" not in body and "refresh_token" not in body
 
-    me = client.get("/api/auth/me", headers={"Authorization": f"Bearer {body['access_token']}"})
-    assert me.status_code == 200
-    assert me.json()["email"] == "newparent@example.com"
+    from sqlalchemy import select
+
+    from app.models.user import ApprovalStatus, User, UserRole
+
+    user = db.execute(select(User).where(User.username == "newparent")).scalar_one()
+    assert user.role == UserRole.CUSTOMER
+    assert user.approval_status == ApprovalStatus.PENDING
 
 
 def test_register_rejects_duplicate_username(client: TestClient, customer_user) -> None:
