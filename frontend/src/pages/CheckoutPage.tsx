@@ -129,7 +129,7 @@ export default function CheckoutPage() {
             <>
               <div>
                 <label className="label text-base" htmlFor="checkout-email">
-                  Email for the receipt
+                  Contact email
                 </label>
                 <input
                   id="checkout-email"
@@ -274,7 +274,7 @@ export default function CheckoutPage() {
                   <br />
                   {address.city}, {address.state} {address.postal_code}, {address.country}
                 </p>
-                <p className="mt-2 text-ink-700">Receipt to {email}</p>
+                <p className="mt-2 text-ink-700">Contact email: {email}</p>
               </div>
 
               <ul className="divide-y divide-ink-800/10">

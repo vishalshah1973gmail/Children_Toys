@@ -9,7 +9,7 @@ Sign in, open the username menu and choose "My orders" (or use "Order history" i
 
 ## What does an order detail page show?
 
-Open an order from the list. The page shows the order number with a status badge, and a timeline of four boxes: Placed, Paid, Shipped and Delivered (each shows a date once reached and is dimmed until then). Below are the items (picture, name, unit price times quantity, line total), the totals (Subtotal, Shipping, Tax, Total), the shipping address and the contact email (labelled Receipt; nothing is emailed to it), and any payments recorded. A "All orders" link goes back to the list.
+Open an order from the list. The page shows the order number with a status badge, and a timeline of four boxes: Placed, Paid, Shipped and Delivered (each shows a date once reached and is dimmed until then). Below are the items (picture, name, unit price times quantity, line total), the totals (Subtotal, Shipping, Tax, Total), the shipping address and the contact email (labelled Contact email; no receipt is emailed to it), and any payments recorded. A "All orders" link goes back to the list.
 
 ## Can I see someone else's order?
 

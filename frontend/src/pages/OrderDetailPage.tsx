@@ -140,7 +140,7 @@ export default function OrderDetailPage() {
               <br />
               {order.shipping_country}
             </p>
-            <p className="mt-3 text-ink-700">Receipt: {order.contact_email}</p>
+            <p className="mt-3 text-ink-700">Contact email: {order.contact_email}</p>
           </div>
 
           {order.payments.length > 0 && (
