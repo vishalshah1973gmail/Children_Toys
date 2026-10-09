@@ -5,7 +5,7 @@ Source: /orders, /orders/:orderNumber, and the order confirmation page (/checkou
 
 ## How do I see my past orders?
 
-Sign in, open the username menu and choose "My orders" (or use "Order history" in the footer). The page "Your orders" lists your orders with their status. If you have none, it says "No orders yet - When you buy something it will appear here with its status and receipt." with a "Start shopping" button. This page needs a signed-in account.
+Sign in, open the username menu and choose "My orders" (or use "Order history" in the footer). The page "Your orders" lists your orders with their status. If you have none, it says "No orders yet - When you buy something it will appear here with its status and details." with a "Start shopping" button. This page needs a signed-in account.
 
 ## What does an order detail page show?
 

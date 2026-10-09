@@ -41,7 +41,7 @@ export default function RegisterPage() {
     <SplitPage
       eyebrow="Join ToyBox"
       title="Create your account"
-      subtitle="One account for your cart, orders and receipts."
+      subtitle="One account for your cart and your orders."
     >
       <form onSubmit={handleSubmit} className="space-y-5">
         <ErrorBanner message={error} onDismiss={() => setError(null)} />

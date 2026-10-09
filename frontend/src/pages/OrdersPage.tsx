@@ -46,7 +46,7 @@ export default function OrdersPage() {
       {result && result.items.length === 0 ? (
         <EmptyState
           title="No orders yet"
-          description="When you buy something it will appear here with its status and receipt."
+          description="When you buy something it will appear here with its status and details."
           action={
             <Link to="/catalog" className="btn-primary">
               Start shopping
