@@ -84,7 +84,8 @@ Write-Host "Waiting for backend to become healthy..."
 $healthy = $false
 for ($i = 0; $i -lt 150; $i++) {
     try {
-        $response = Invoke-WebRequest -Uri "http://localhost:8000/health" -UseBasicParsing -TimeoutSec 1
+        # 127.0.0.1, not localhost: here localhost tries ::1 first and takes ~2s to fail over, so a 1s timeout never succeeded.
+        $response = Invoke-WebRequest -Uri "http://127.0.0.1:8000/health" -UseBasicParsing -TimeoutSec 1
         if ($response.StatusCode -eq 200) { $healthy = $true; break }
     } catch {}
     Start-Sleep -Milliseconds 300
@@ -93,7 +94,7 @@ for ($i = 0; $i -lt 150; $i++) {
 if ($healthy) {
     Write-Host "Backend is healthy." -ForegroundColor Green
 } else {
-    Write-Host "Backend did not report healthy within 45s. Check scripts\logs\backend.err.log" -ForegroundColor Yellow
+    Write-Host "Backend did not report healthy within ~45s. Check scripts\logs\backend.err.log" -ForegroundColor Yellow
 }
 
 # --- Cloudflare tunnel (docker) -------------------------------------------------
