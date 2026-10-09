@@ -362,6 +362,12 @@ uvicorn app.main:app --reload --port 8000
 
 Interactive docs: <http://localhost:8000/docs>
 
+On Windows, `.\scripts\start.ps1` starts the API (port 8000) and the frontend
+(port 5173) in the background in about five seconds, and `.\scripts\stop.ps1`
+stops them. Logs go to `scripts/logs/`. The script checks
+`http://127.0.0.1:8000/health` rather than `localhost`, because on some Windows
+machines `localhost` tries IPv6 first and is slow to fail over.
+
 `backend/.env` is read only when the API starts, so restart it after editing
 `.env`. Environment variables set in your terminal override `.env` (a leftover
 `DATABASE_URL` or `SMTP_HOST` from an earlier session will win), so clear them
