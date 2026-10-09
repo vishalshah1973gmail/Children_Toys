@@ -230,7 +230,7 @@ export default function ChatWidget() {
               launcherRef.current?.focus()
             }
           }}
-          className="chat-open flex h-[min(36rem,calc(100dvh-22rem))] max-h-[calc(100vh-22rem)] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-ink-800/10 bg-[#fffaf5] shadow-2xl"
+          className="chat-open flex h-[min(36rem,calc(100dvh-6rem))] max-h-[calc(100vh-6rem)] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-ink-800/10 bg-[#fffaf5] shadow-2xl"
         >
           <header className="flex items-center gap-3 bg-gradient-to-r from-brand-600 to-brand-700 px-4 py-3 text-white">
             <Avatar size="md" />
