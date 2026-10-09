@@ -1,10 +1,11 @@
 """User, authentication and token schemas."""
 
 from datetime import datetime
+from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints, field_validator
 
-from app.models.user import UserRole
+from app.models.user import ApprovalStatus, UserRole
 
 
 class UserBase(BaseModel):
@@ -41,6 +42,7 @@ class UserRead(BaseModel):
     full_name: str | None = None
     role: UserRole
     is_active: bool
+    approval_status: ApprovalStatus
     created_at: datetime
 
 
@@ -86,3 +88,23 @@ class AuthResponse(TokenPair):
     """Token pair plus the authenticated user."""
 
     user: UserRead
+
+
+class RegisterResponse(BaseModel):
+    """Registration outcome: the account exists but cannot sign in yet."""
+
+    status: str
+    message: str
+
+
+class RegistrationRead(UserRead):
+    """A registration as the admin reviews it."""
+
+    rejection_reason: str | None = None
+    reviewed_at: datetime | None = None
+
+
+class RejectRequest(BaseModel):
+    """Admin rejection payload; the reason is emailed to the applicant."""
+
+    reason: Annotated[str, StringConstraints(strip_whitespace=True, min_length=5, max_length=500)]

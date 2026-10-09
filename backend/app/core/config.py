@@ -63,6 +63,10 @@ class Settings(BaseSettings):
     smtp_user: str = ""
     smtp_app_password: str = ""
     email_from: str = ""
+    # Registration approval: who is told about new sign-ups, and the storefront
+    # origin used for links in emails (public_base_url is the backend, not this).
+    admin_notify_email: str = ""
+    frontend_base_url: str = "http://localhost:5173"
 
     # Chatbot (Lyzr agent proxy)
     lyzr_api_key: str = ""
