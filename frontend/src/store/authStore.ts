@@ -2,14 +2,14 @@ import { create } from 'zustand'
 
 import { authApi, type RegisterPayload } from '../api/auth'
 import { setSessionExpiredHandler, tokenStorage } from '../api/client'
-import type { User } from '../types'
+import type { RegisterResult, User } from '../types'
 
 interface AuthState {
   user: User | null
   initialised: boolean
   loading: boolean
   login: (username: string, password: string) => Promise<User>
-  register: (payload: RegisterPayload) => Promise<User>
+  register: (payload: RegisterPayload) => Promise<RegisterResult>
   logout: () => Promise<void>
   bootstrap: () => Promise<void>
   isAdmin: () => boolean
@@ -35,10 +35,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   async register(payload) {
     set({ loading: true })
     try {
-      const response = await authApi.register(payload)
-      tokenStorage.set(response.access_token, response.refresh_token)
-      set({ user: response.user, initialised: true })
-      return response.user
+      // The account is pending: no tokens, no sign-in.
+      return await authApi.register(payload)
     } finally {
       set({ loading: false })
     }

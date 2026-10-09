@@ -7,7 +7,25 @@ export interface User {
   full_name: string | null
   role: UserRole
   is_active: boolean
+  approval_status: ApprovalStatus
   created_at: string
+}
+
+export type ApprovalStatus = 'pending' | 'approved' | 'rejected'
+
+export interface RegisterResult {
+  status: string
+  message: string
+}
+
+export interface Registration extends User {
+  rejection_reason: string | null
+  reviewed_at: string | null
+}
+
+export interface RegistrationDecision {
+  user: Registration
+  email_sent: boolean
 }
 
 export interface AuthResponse {
@@ -176,6 +194,7 @@ export interface AdminStats {
   customers: number
   orders: number
   pending_orders: number
+  pending_approvals: number
   revenue_cents: number
 }
 

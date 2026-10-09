@@ -2,17 +2,17 @@ import { type FormEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { toApiError } from '../api/client'
+import Dialog from '../components/Dialog'
 import ErrorBanner from '../components/ErrorBanner'
 import SplitPage from '../components/SplitPage'
 import { useAuthStore } from '../store/authStore'
-import { useCartStore } from '../store/cartStore'
 
 /** Create a customer account. */
 export default function RegisterPage() {
   const register = useAuthStore((state) => state.register)
   const loading = useAuthStore((state) => state.loading)
-  const mergeGuestCart = useCartStore((state) => state.mergeGuestCart)
   const navigate = useNavigate()
+  const [submitted, setSubmitted] = useState(false)
 
   const [form, setForm] = useState({ username: '', email: '', full_name: '', password: '' })
   const [error, setError] = useState<string | null>(null)
@@ -31,8 +31,7 @@ export default function RegisterPage() {
         full_name: form.full_name.trim() || undefined,
         password: form.password,
       })
-      await mergeGuestCart()
-      navigate('/', { replace: true })
+      setSubmitted(true)
     } catch (caught) {
       setError(toApiError(caught).message)
     }
@@ -119,6 +118,21 @@ export default function RegisterPage() {
           </Link>
         </p>
       </form>
+
+      {submitted && (
+        <Dialog
+          title="Registration submitted"
+          onClose={() => navigate('/login', { replace: true })}
+          actions={
+            <button type="button" className="btn-primary px-5 py-2" onClick={() => navigate('/login', { replace: true })}>
+              OK
+            </button>
+          }
+        >
+          Your registration approval is in progress. We have asked the site admin to review it,
+          and you will get an email as soon as a decision is made. You can sign in once it is approved.
+        </Dialog>
+      )}
     </SplitPage>
   )
 }

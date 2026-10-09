@@ -1,5 +1,5 @@
 import { api } from './client'
-import type { AuthResponse, User } from '../types'
+import type { AuthResponse, RegisterResult, User } from '../types'
 
 export interface RegisterPayload {
   username: string
@@ -9,8 +9,8 @@ export interface RegisterPayload {
 }
 
 export const authApi = {
-  async register(payload: RegisterPayload): Promise<AuthResponse> {
-    const { data } = await api.post<AuthResponse>('/auth/register', payload)
+  async register(payload: RegisterPayload): Promise<RegisterResult> {
+    const { data } = await api.post<RegisterResult>('/auth/register', payload)
     return data
   },
   async login(username: string, password: string): Promise<AuthResponse> {
