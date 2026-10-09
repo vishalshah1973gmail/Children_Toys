@@ -49,7 +49,8 @@ ECommerce_Website/
 │   ├── alembic/
 │   │   ├── env.py
 │   │   ├── script.py.mako
-│   │   └── versions/0001_initial_schema.py
+│   │   └── versions/  0001_initial_schema.py  0002_guest_checkout.py (columns now unused)
+│   │                  0003_user_approval.py
 │   ├── app/
 │   │   ├── __init__.py
 │   │   ├── main.py              FastAPI app, CORS, static mount, routers
@@ -63,7 +64,7 @@ ECommerce_Website/
 │   │   │   ├── base.py          DeclarativeBase + TimestampMixin
 │   │   │   └── session.py       engine, SessionLocal, get_db
 │   │   ├── models/
-│   │   │   ├── user.py          users, UserRole
+│   │   │   ├── user.py          users, UserRole, ApprovalStatus (pending/approved/rejected)
 │   │   │   ├── token.py         revoked_tokens (logout denylist)
 │   │   │   ├── category.py      categories
 │   │   │   ├── product.py       products, product_images
@@ -79,6 +80,8 @@ ECommerce_Website/
 │   │   │   ├── cart_service.py  cart reads and mutations
 │   │   │   ├── order_service.py order creation, payment confirmation
 │   │   │   ├── stripe_service.py Checkout Session + signature verification
+│   │   │   ├── email_service.py send_mail + registration email renderers (SMTP)
+│   │   │   ├── registration_service.py best-effort admin/approval/rejection emails
 │   │   │   ├── chat_service.py  Lyzr agent proxy + per-client rate limiter
 │   │   │   └── chat_products.py products named in a chat reply (for cards)
 │   │   └── routers/
@@ -88,14 +91,18 @@ ECommerce_Website/
 │   │   ├── catalog_data.py            5 categories + 24 toys
 │   │   ├── generate_synthetic_data.py 2026 customers/orders → CSV
 │   │   ├── export_kb_products.py      active products → chatbot knowledge-base markdown
+│   │   ├── reset_data.py              "Reset Data": back up, then delete all customer data (dev only)
 │   │   └── seed.py                    loads everything into the database
 │   ├── data/                    generated CSVs (products, customers, orders,
 │   │                            order_items, payments)
 │   ├── static/uploads/          product images on local disk
 │   └── tests/
-│       ├── conftest.py  test_auth.py  test_admin_access.py
+│       ├── conftest.py  test_auth.py  test_admin_access.py  test_user_approval_model.py
+│       ├── test_registration_flow.py  test_registration_email.py  test_admin_registrations.py
 │       ├── test_cart.py  test_checkout.py  test_chat.py  test_chat_products.py
+│       └── test_reset_data.py
 ├── docs/
+│   ├── Deployment_And_UserGuide.docx  deployment + user guide with screenshots (rebuilt 2026-10-09)
 │   └── chatbot-kb/              chatbot knowledge pack (docs 00-02 and 04-08, products.md,
 │                                test-questions.md); _crawl/ is scratch, not ingested
 └── frontend/
@@ -111,16 +118,17 @@ ECommerce_Website/
         │   Layout.tsx  Navbar.tsx  Footer.tsx  ProductCard.tsx
         │   CatalogFilters.tsx  Pagination.tsx  Spinner.tsx
         │   ErrorBanner.tsx  EmptyState.tsx  ProtectedRoute.tsx
-        │   AdminRoute.tsx  AdminLayout.tsx  ChatWidget.tsx
+        │   AdminRoute.tsx  AdminLayout.tsx  ChatWidget.tsx  Dialog.tsx
         │   chat/  ChatMessageBody.tsx  ProductCard.tsx  SuggestionChips.tsx
-        │          MessageActions.tsx  chatText.ts  chatSuggestions.ts
+        │          MessageActions.tsx  chatText.ts  chatSuggestions.ts  chatGate.ts
         └── pages/
             HomePage  CatalogPage  ProductDetailPage  CartPage
             CheckoutPage  CheckoutSuccessPage  CheckoutCancelPage
             OrdersPage  OrderDetailPage  AccountPage
             LoginPage  RegisterPage  NotFoundPage
-            admin/ AdminOverviewPage  AdminProductsPage  ProductFormModal
-                   AdminCategoriesPage  AdminOrdersPage
+            FeedbackPage
+            admin/ AdminOverviewPage  AdminApprovalsPage  AdminProductsPage
+                   ProductFormModal  AdminCategoriesPage  AdminOrdersPage
 ```
 
 ---
@@ -133,7 +141,7 @@ All money is stored as **integer cents**. All ages are stored in **months**.
 | Column | Type | Notes |
 |---|---|---|
 | id | INTEGER | PK |
-| username | VARCHAR(50) | unique, indexed |
+| username | VARCHAR(50) | unique, indexed (login and sign-up compare it case-insensitively; the DB index itself is case-sensitive) |
 | email | VARCHAR(255) | unique, indexed |
 | full_name | VARCHAR(120) | nullable |
 | hashed_password | VARCHAR(255) | bcrypt, never plaintext |
@@ -245,7 +253,7 @@ Base path `/api`. Auth is a `Bearer <access_token>` header.
 |---|---|---|---|
 | GET | `/health` | — | Liveness probe (no `/api` prefix) |
 | POST | `/auth/register` | — | Create a `pending` customer account; returns `{status: "pending", message}` and no tokens (an admin must approve it; a rejected account can re-register with the same username and email) |
-| POST | `/auth/login` | — | Exchange username + password for tokens; 403 `approval_pending` / `registration_rejected` until approved |
+| POST | `/auth/login` | — | Exchange username (not case-sensitive) + password for tokens; 403 `approval_pending` / `registration_rejected` until approved |
 | POST | `/auth/refresh` | — | Swap a refresh token for a new pair |
 | POST | `/auth/logout` | — | Revoke a refresh token |
 | GET | `/auth/me` | user | The signed-in user |
@@ -354,6 +362,25 @@ uvicorn app.main:app --reload --port 8000
 
 Interactive docs: <http://localhost:8000/docs>
 
+`backend/.env` is read only when the API starts, so restart it after editing
+`.env`. Environment variables set in your terminal override `.env` (a leftover
+`DATABASE_URL` or `SMTP_HOST` from an earlier session will win), so clear them
+or use a fresh terminal.
+
+**Reset the demo data** (development databases only). From `backend/`:
+
+```bash
+python -m scripts.reset_data         # dry run: shows what would be deleted
+python -m scripts.reset_data --yes   # copies the database to ~/ToyBox-backups, then deletes
+```
+
+It deletes every non-admin user (including pending and rejected registrations),
+all orders, order items, payments and cart items, and the revoked tokens of the
+deleted users, and adds stock back from deleted paid, shipped or delivered
+orders. The admin account and the catalogue are kept. It refuses to run on a
+non-SQLite database, when `ENVIRONMENT` is not `development`, or when no admin
+exists. To undo, stop the app and copy the backup over `backend/app.db`.
+
 ### 6.2 Frontend
 
 In a second terminal:
@@ -389,6 +416,9 @@ backend, `test_chat.py` covers the endpoint and `test_chat_products.py` covers
 the product matching.
 
 Each test gets its own throwaway SQLite file, so tests never touch `app.db`.
+`tests/conftest.py` also blanks `SMTP_HOST`, `ADMIN_NOTIFY_EMAIL` and the Lyzr
+keys before the app loads, so the suite can never send real email or call Lyzr
+even though `backend/.env` holds live values.
 Coverage includes registration, login with the wrong password, an admin route
 blocked for a customer, add-to-cart, and checkout rejected on insufficient
 stock — plus refresh-token revocation, server-side pricing, and the rule that
