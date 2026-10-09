@@ -139,6 +139,9 @@ All money is stored as **integer cents**. All ages are stored in **months**.
 | hashed_password | VARCHAR(255) | bcrypt, never plaintext |
 | role | ENUM(customer, admin) | indexed, default `customer` |
 | is_active | BOOLEAN | default true |
+| approval_status | VARCHAR(20) | `pending` / `approved` / `rejected`, indexed; migration `0003_user_approval` backfills existing users as `approved` |
+| rejection_reason | VARCHAR(500) | nullable, set when an admin rejects |
+| reviewed_at | TIMESTAMP | nullable, when an admin last reviewed the registration |
 | created_at / updated_at | TIMESTAMP | |
 
 ### revoked_tokens
@@ -241,8 +244,8 @@ Base path `/api`. Auth is a `Bearer <access_token>` header.
 | Method | Path | Auth | Purpose |
 |---|---|---|---|
 | GET | `/health` | — | Liveness probe (no `/api` prefix) |
-| POST | `/auth/register` | — | Create a customer account, return tokens |
-| POST | `/auth/login` | — | Exchange username + password for tokens |
+| POST | `/auth/register` | — | Create a `pending` customer account; returns `{status: "pending", message}` and no tokens (an admin must approve it; a rejected account can re-register with the same username and email) |
+| POST | `/auth/login` | — | Exchange username + password for tokens; 403 `approval_pending` / `registration_rejected` until approved |
 | POST | `/auth/refresh` | — | Swap a refresh token for a new pair |
 | POST | `/auth/logout` | — | Revoke a refresh token |
 | GET | `/auth/me` | user | The signed-in user |
@@ -262,10 +265,13 @@ Base path `/api`. Auth is a `Bearer <access_token>` header.
 | POST | `/checkout/session` | user | Create the pending order + Stripe session |
 | POST | `/checkout/dev-confirm/{order_number}` | user | Local confirm when Stripe is unconfigured |
 | POST | `/webhooks/stripe` | Stripe signature | Confirm payment, decrement stock |
-| POST | `/chat` | — | Shopper chatbot: `{message, session_id}` → `{reply, products}` (up to 3 live product cards); 429 `rate_limited`, 503 `chat_not_configured` / `chat_unavailable` |
+| POST | `/chat` | user | Shopper chatbot (signed-in approved users only): `{message, session_id}` → `{reply, products}` (up to 3 live product cards); 401 `not_authenticated`, 429 `rate_limited`, 503 `chat_not_configured` / `chat_unavailable` |
 | GET | `/orders` | user | Own order history, paginated |
 | GET | `/orders/{order_number}` | user | Own order (admins may read any) |
-| GET | `/admin/stats` | admin | Dashboard headline numbers |
+| GET | `/admin/stats` | admin | Dashboard headline numbers, including `pending_approvals` |
+| GET | `/admin/registrations` | admin | Registrations, filterable by `status` (default pending) |
+| POST | `/admin/registrations/{id}/approve` | admin | Approve a registration and email the applicant |
+| POST | `/admin/registrations/{id}/reject` | admin | Reject with a required `reason` and email the applicant; 409 `already_reviewed` if already decided |
 | GET | `/admin/products` | admin | All products, inactive included |
 | POST | `/admin/products` | admin | Create a product |
 | PATCH | `/admin/products/{id}` | admin | Edit a product (and its images) |
@@ -390,7 +396,7 @@ cd frontend
 node --test         # Node 24; give it no directory argument (naming the directory fails)
 ```
 
-It runs `tests/chatText.test.mjs` and `tests/chatSuggestions.test.mjs`. On the
+It runs `tests/chatText.test.mjs`, `tests/chatSuggestions.test.mjs` and `tests/chatGate.test.mjs`. On the
 backend, `test_chat.py` covers the endpoint and `test_chat_products.py` covers
 the product matching.
 
@@ -447,6 +453,18 @@ you have any keys.
 
 A webhook with a missing or invalid signature is rejected with `400`; with no
 `STRIPE_WEBHOOK_SECRET` configured at all it returns `503`.
+
+### Registration approval settings
+
+New accounts wait for admin approval, and emails use the existing `SMTP_*`
+settings. Two more variables in `backend/.env` (see `backend/.env.example`):
+
+```
+ADMIN_NOTIFY_EMAIL=   # where new-registration alerts go; blank = first admin user's email
+FRONTEND_BASE_URL=http://localhost:5173   # base of the sign-in link in approval emails
+```
+
+Emails are best-effort: a failure is logged and never fails the request.
 
 ### Chatbot keys
 
@@ -543,12 +561,17 @@ python -m scripts.seed --reset          # then reload
 ## 13. Chatbot
 
 A floating chat widget (`ChatWidget.tsx`, mounted in `Layout.tsx` and hidden on
-`/admin` pages) lets shoppers ask questions about the store. It calls the public
-`POST /api/chat` endpoint, which forwards the message to a Lyzr agent through
+`/admin` pages) lets shoppers ask questions about the store. It calls the
+`POST /api/chat` endpoint, which requires a signed-in approved user (otherwise
+`401 not_authenticated`), which forwards the message to a Lyzr agent through
 `services/chat_service.py`. The Lyzr key stays on the server and is never sent to
 the browser. Messages are limited to 500 characters, and each client is limited
-to 20 requests per minute by an in-memory limiter. The browser keeps an anonymous
-session id in `localStorage` under `toybox.chat_session`.
+to 20 requests per minute by an in-memory limiter. Logged-out visitors who click the
+launcher see a popup (text in `frontend/src/components/chat/chatGate.ts`) saying
+they must register and log in. The browser keeps a session id in `localStorage`
+under `toybox.chat_session`, but it is cleared and the conversation wiped whenever
+the signed-in user changes (including at page load), so it does not survive a
+reload.
 
 **Product cards.** After the Lyzr call, the endpoint looks for products named in
 the reply (`services/chat_products.py`) and returns up to three of them as
@@ -639,7 +662,9 @@ session.
   a caller can send a new value with every request, get a fresh limiter key each
   time, bypass the paid-API cap and grow the limiter's in-memory dict forever.
   Without trusting the proxy, all visitors share one key and one global cap of
-  20 messages a minute. Before going public, key the limiter on the right-most
+  20 messages a minute. Before going public (recommended, not done), key the limiter on the user id now that chat is
+  authenticated (a one-line change in `backend/app/routers/chat.py`), which also
+  removes this spoofing concern. Otherwise key it on the right-most
   `X-Forwarded-For` entry (the hop the platform appended) with a small helper in
   `backend/app/routers/chat.py`, or set `forwarded-allow-ips` to the platform's
   actual proxy range. After deploying, send a forged `X-Forwarded-For` and check
