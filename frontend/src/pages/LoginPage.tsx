@@ -83,11 +83,6 @@ export default function LoginPage() {
           </Link>
         </p>
       </form>
-
-      <div className="mt-6 rounded-lg border border-dashed border-ink-800/20 p-4 text-sm text-ink-700">
-        <p className="font-semibold">Seeded demo logins</p>
-        <p>admin / Admin123! — customer / Customer123!</p>
-      </div>
     </SplitPage>
   )
 }
