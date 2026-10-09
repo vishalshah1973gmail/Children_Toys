@@ -35,7 +35,11 @@ def test_chat_requires_login(client, monkeypatch):
     assert response.json()["error"]["code"] == "not_authenticated"
 
 
-def test_chat_rejects_a_garbage_token(client):
+def test_chat_rejects_a_garbage_token(client, monkeypatch):
+    async def boom(message, session_id):
+        raise AssertionError("Lyzr must not be called")
+
+    monkeypatch.setattr(chat_service, "ask_agent", boom)
     client.headers["Authorization"] = "Bearer not-a-token"
     assert client.post("/api/chat", json=VALID).status_code == 401
 
